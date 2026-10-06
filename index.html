@@ -3985,10 +3985,14 @@
         const x = Math.max(0, (bb.x0 - pad) * d), y = Math.max(0, (bb.y0 - pad) * d);
         const w = Math.min(cv.width - x, (bb.x1 - bb.x0 + pad * 2) * d), h = Math.min(cv.height - y, (bb.y1 - bb.y0 + pad * 2) * d);
         if (w < 40 * d / 2 && h < 40 * d / 2) return null;
-        const k = Math.min(1, 380 / w), o = document.createElement("canvas");
-        o.width = Math.max(1, Math.round(w * k)); o.height = Math.max(1, Math.round(h * k));
-        o.getContext("2d").drawImage(cv, x, y, w, h, 0, 0, o.width, o.height);
-        return o.toDataURL("image/png");
+        let url = "";
+        for (const tw of [380, 320, 260, 210, 170]) {            // thu nhỏ dần để ảnh luôn nhẹ (giới hạn lưu trữ của máy chủ)
+          const k = Math.min(1, tw / w), o = document.createElement("canvas");
+          o.width = Math.max(1, Math.round(w * k)); o.height = Math.max(1, Math.round(h * k));
+          o.getContext("2d").drawImage(cv, x, y, w, h, 0, 0, o.width, o.height);
+          url = o.toDataURL("image/png"); if (url.length <= 42000) break;
+        }
+        return url;
       }
 
       /* ----- bố trí chữ ký lên bức tranh: lưới khe trong vùng giấy trống, xáo trộn cố định ----- */
