@@ -3996,6 +3996,10 @@
       const ORDER = (() => { const a = [...Array(COLS * ROWS).keys()]; let sd = 11; for (let i = a.length - 1; i > 0; i--) { sd = (sd * 9301 + 49297) % 233280; const j = Math.floor(sd / 233280 * (i + 1));[a[i], a[j]] = [a[j], a[i]]; } return a; })();
       const hash = str => { let h = 7; for (const c of str) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; };
       function layout(sg, i, ar) {
+        if (sg.x != null && sg.y != null) {                       // bố cục do quản trị chỉnh (x, y theo % ảnh; s = hệ số kích thước)
+          const bw = Math.min(11.5, 6.4 * ar * (H / W));
+          return { cx: sg.x, cy: sg.y, rot: sg.r || 0, w: bw * (sg.s || 1), z: sg.z };
+        }
         const n = COLS * ROWS, ly = Math.floor(i / n), k = ORDER[(i + ly * 5) % n];
         const cw = (X1 - X0) / COLS, ch = (Y1 - Y0) / ROWS, h = hash(sg.id);
         let cx = X0 + cw * ((k % COLS) + .5), cy = Y0 + ch * (Math.floor(k / COLS) + .5);
@@ -4016,7 +4020,7 @@
           if (!ims[i]) return;
           const L = layout(sg, i, ims[i].naturalWidth / ims[i].naturalHeight), im = ims[i], el = document.createElement("div");
           el.className = "sgw" + (sg.id === newId ? " new" : ""); if (sg.name) el.title = sg.name;
-          el.style.cssText = "left:" + L.cx + "%;top:" + L.cy + "%;width:" + L.w + "%;--r:" + L.rot + "deg";
+          el.style.cssText = "left:" + L.cx + "%;top:" + L.cy + "%;width:" + L.w + "%;--r:" + L.rot + "deg" + (L.z != null ? ";z-index:" + (Math.round(L.z) + 1000) : "");
           im.alt = sg.name ? "Chữ ký của " + sg.name : "Chữ ký"; el.appendChild(im);
           if (sg.name) { const n = document.createElement("span"); n.className = "sgn"; n.textContent = sg.name; el.appendChild(n); }
           layer.appendChild(el);
@@ -4026,7 +4030,7 @@
 
       /* ----- lưu trữ ----- */
       const saveLocal = () => { try { localStorage.setItem(KEY, JSON.stringify(sigs.slice(-60))); } catch (e) { } };
-      const merge = arr => { const ids = new Set(sigs.map(x => x.id)); arr.forEach(x => { if (x && x.id && x.img && !ids.has(x.id)) { sigs.push({ id: String(x.id), name: x.name || "", img: x.img, t: +x.t || Date.now() }); ids.add(x.id); } }); };
+      const merge = arr => { const ids = new Set(sigs.map(x => x.id)); arr.forEach(x => { if (x && x.id && x.img && !ids.has(x.id)) { sigs.push({ id: String(x.id), name: x.name || "", img: x.img, t: +x.t || Date.now(), x: x.x, y: x.y, s: x.s, r: x.r, z: x.z }); ids.add(x.id); } }); };
       try { merge(JSON.parse(localStorage.getItem(KEY) || "[]")); } catch (e) { }
       render();
       if (ENDPOINT) fetch(ENDPOINT + (ENDPOINT.includes("?") ? "&" : "?") + "action=list").then(r => r.json()).then(arr => { if (Array.isArray(arr)) { sigs = []; merge(arr); saveLocal(); render(); } }).catch(() => { });
@@ -4059,7 +4063,7 @@
         if (!confirm("XÓA TẤT CẢ " + sigs.length + " chữ ký?\nHành động này không thể hoàn tác.\n\nGợi ý: hãy bấm 'Tải bức tranh về máy' để lưu lại trước khi xóa.")) return;
         try {
           if (ENDPOINT) {
-            const key = prompt("Nhập mã quản trị (ADMIN_KEY trong google-apps-script.gs):");
+            const key = prompt("Nhập mã quản trị (ADMIN_KEY trong Thuộc tính tập lệnh của Apps Script):");
             if (!key) return;
             const r = await fetch(ENDPOINT + (ENDPOINT.includes("?") ? "&" : "?") + "action=clear&key=" + encodeURIComponent(key));
             const j = await r.json();
@@ -4085,9 +4089,8 @@
           try { await document.fonts.ready; } catch (e) { }
           const list = sigs.slice().sort((a, b) => a.t - b.t), ims = await Promise.all(list.map(s => loadImg(s.img)));
           g.globalCompositeOperation = "multiply";
-          list.forEach((sg, i) => {
-            const im = ims[i]; if (!im) return;
-            const L = layout(sg, i, im.naturalWidth / im.naturalHeight), w = L.w / 100 * W, h = w * im.naturalHeight / im.naturalWidth;
+          list.map((sg, i) => ({ sg, im: ims[i], i })).filter(o => o.im).map(o => ({ ...o, L: layout(o.sg, o.i, o.im.naturalWidth / o.im.naturalHeight) })).sort((a, b) => (a.L.z != null ? a.L.z : a.i) - (b.L.z != null ? b.L.z : b.i)).forEach(({ sg, im, L }) => {
+            const w = L.w / 100 * W, h = w * im.naturalHeight / im.naturalWidth;
             g.save(); g.translate(L.cx / 100 * W, L.cy / 100 * H); g.rotate(L.rot * Math.PI / 180); g.drawImage(im, -w / 2, -h / 2, w, h);
             if (sg.name) {
               const fs = 1.45 / 100 * W, maxN = 14 / 100 * W - 2;
