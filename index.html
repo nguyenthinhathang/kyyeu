@@ -4050,7 +4050,7 @@
         btn.disabled = true;
         try {
           if (ENDPOINT) {
-            const fd = new FormData(); fd.append("action", "sign"); fd.append("id", sg.id); fd.append("name", sg.name); fd.append("img", sg.img);
+            const fd = new URLSearchParams(); fd.append("action", "sign"); fd.append("id", sg.id); fd.append("name", sg.name); fd.append("img", sg.img);
             await fetch(ENDPOINT, { method: "POST", mode: "no-cors", body: fd });
           }
           sigs.push(sg); saveLocal(); try { localStorage.setItem(LASTKEY, String(Date.now())); } catch (e) { }
