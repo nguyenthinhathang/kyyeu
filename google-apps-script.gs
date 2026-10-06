@@ -22,7 +22,7 @@
 var SHEET_SIGN = 'ChuKy';
 var SHEET_WISH = 'TriAn';
 var MAX_IMG = 45000;     // giới hạn ô Google Sheet là 50.000 ký tự
-var ADMIN_KEY = 'DOI-MAT-KHAU-NAY';   // ĐỔI thành mật khẩu riêng của bạn trước khi triển khai (dùng để xóa tất cả chữ ký)
+var ADMIN_KEY = '1331998';   // ĐỔI thành mật khẩu riêng của bạn trước khi triển khai (dùng để xóa tất cả chữ ký)
 var MAX_LIST = 400;      // số chữ ký tối đa trả về khi tải trang
 
 function sheet_(name, header) {
