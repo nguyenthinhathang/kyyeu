@@ -3814,7 +3814,7 @@
       flag("e-msg", form.message.value.trim().length < 5, form.message);
       if (!ok) { form.querySelector(".bad").focus(); return; }
 
-      const data = new FormData();
+      const data = new URLSearchParams();      // dạng form tiêu chuẩn: Apps Script đọc ổn định
       const m = CONFIG.fieldMap;
       data.append(m.name, form.name.value.trim());
       data.append(m.org, form.org.value.trim());
