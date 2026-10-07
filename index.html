@@ -4037,7 +4037,9 @@
       const merge = arr => { const ids = new Set(sigs.map(x => x.id)); arr.forEach(x => { if (x && x.id && x.img && !ids.has(x.id)) { sigs.push({ id: String(x.id), name: x.name || "", img: x.img, t: +x.t || Date.now(), x: x.x, y: x.y, s: x.s, r: x.r, z: x.z }); ids.add(x.id); } }); };
       try { merge(JSON.parse(localStorage.getItem(KEY) || "[]")); } catch (e) { }
       render();
-      if (ENDPOINT) fetch(ENDPOINT + (ENDPOINT.includes("?") ? "&" : "?") + "action=list").then(r => r.json()).then(arr => { if (Array.isArray(arr)) { sigs = []; merge(arr); saveLocal(); render(); } }).catch(() => { });
+      const listUrl = ENDPOINT + (ENDPOINT.includes("?") ? "&" : "?") + "action=list";
+      const noServer = () => { const n = $("#sgNote"); n.textContent = "Không kết nối được máy chủ lưu chữ ký: chữ ký chỉ hiển thị trên thiết bị này và người khác sẽ không thấy."; n.hidden = false; };
+      if (ENDPOINT) fetch(listUrl).then(r => r.json()).then(arr => { if (Array.isArray(arr)) { sigs = []; merge(arr); saveLocal(); render(); $("#sgNote").hidden = true; } else noServer(); }).catch(noServer);
 
       $("#padSend").onclick = async () => {
         const btn = $("#padSend"), img = exportSig();
@@ -4056,6 +4058,7 @@
           sigs.push(sg); saveLocal(); try { localStorage.setItem(LASTKEY, String(Date.now())); } catch (e) { }
           clearPad(); resetUp(); await render(sg.id);
           toast("Cảm ơn quý vị đã để lại chữ ký");
+          if (ENDPOINT) setTimeout(() => fetch(listUrl).then(r => r.json()).then(a => { if (!Array.isArray(a)) throw 0; $("#sgNote").hidden = true; }).catch(() => { noServer(); toast("Lưu ý: chưa kết nối được máy chủ nên chữ ký chỉ lưu trên thiết bị này"); }), 2500);
           const box = $("#wallbox"); box.scrollIntoView({ behavior: "smooth", block: "center" });
         } catch (e) { toast("Gửi chưa được, vui lòng thử lại"); }
         btn.disabled = false;
