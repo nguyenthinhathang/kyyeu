@@ -1237,6 +1237,10 @@
       padding: 20px 0 76px
     }
 
+    #hanhtrinh[hidden] {
+      display: none
+    }
+
     #hanhtrinh .intro {
       padding: 0 18px;
       margin-bottom: 22px
@@ -3011,31 +3015,163 @@
       padding: 8px 18px;
       font-size: 14px
     }
-  
+
     /* ===== TẢI ẢNH CHỮ KÝ (tự tách nền) ===== */
-    .tabs { display: flex; gap: 6px; padding: 5px; border-radius: 999px; background: rgba(255, 255, 255, .06); border: 1px solid var(--glass-line); margin: 0 auto 16px; max-width: 380px }
-    .tab { flex: 1; min-height: 44px; border: 0; border-radius: 999px; background: none; color: var(--text); font: 500 14px var(--font-sans); cursor: pointer; transition: background .25s }
-    .tab.on { background: var(--gold-grad); color: var(--ink); font-weight: 600 }
-    .pad.m-up #paneDraw, .pad.m-up #padClear { display: none }
-    .pad:not(.m-up) #paneUp { display: none }
-    #paneUp [hidden] { display: none !important }
-    .drop { position: relative; display: flex; align-items: center; justify-content: center; min-height: 210px; margin: 0; padding: 16px; text-align: center; font-weight: 400; cursor: pointer; overflow: hidden;
-      border-radius: 16px; border: 2px dashed rgba(235, 210, 138, .5); background: rgba(255, 255, 255, .04); transition: background .25s, border-color .25s }
-    .drop:hover, .drop.over, .drop:focus-visible { background: rgba(255, 255, 255, .09); border-color: var(--gold) }
-    .drop-in svg { width: 42px; height: 42px; stroke: var(--gold-soft); fill: none; stroke-width: 1.5 }
-    .drop-in b { display: block; margin-top: 6px; font-size: 17px; font-weight: 600 }
-    .drop-in span { display: block; color: var(--muted); font-size: 14px }
-    .drop-in small { display: block; margin: 10px auto 0; max-width: 330px; color: var(--muted); font-size: 12.5px; line-height: 1.5 }
-    .up-prev { width: 100%; min-height: 178px; display: flex; align-items: center; justify-content: center; border-radius: 10px; padding: 12px;
-      background-color: #f8f2e4; background-image: linear-gradient(45deg, #ece2c9 25%, transparent 25%, transparent 75%, #ece2c9 75%), linear-gradient(45deg, #ece2c9 25%, transparent 25%, transparent 75%, #ece2c9 75%);
-      background-size: 16px 16px; background-position: 0 0, 8px 8px }
-    .up-prev img { max-width: 100%; max-height: 190px }
-    .up-again { text-align: center; font-size: 12.5px; color: var(--muted); margin-top: 8px }
-    .up-opts { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin: 14px 2px 0; font-size: 14px }
-    .up-opts label { margin: 0; font-weight: 400; display: flex; align-items: center; gap: 8px }
-    .up-opts input[type=range] { width: 150px; accent-color: var(--gold) }
-    .up-opts input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--gold) }
-    .pad-tools { margin-top: 14px }
+    .tabs {
+      display: flex;
+      gap: 6px;
+      padding: 5px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid var(--glass-line);
+      margin: 0 auto 16px;
+      max-width: 380px
+    }
+
+    .tab {
+      flex: 1;
+      min-height: 44px;
+      border: 0;
+      border-radius: 999px;
+      background: none;
+      color: var(--text);
+      font: 500 14px var(--font-sans);
+      cursor: pointer;
+      transition: background .25s
+    }
+
+    .tab.on {
+      background: var(--gold-grad);
+      color: var(--ink);
+      font-weight: 600
+    }
+
+    .pad.m-up #paneDraw,
+    .pad.m-up #padClear {
+      display: none
+    }
+
+    .pad:not(.m-up) #paneUp {
+      display: none
+    }
+
+    #paneUp [hidden] {
+      display: none !important
+    }
+
+    .drop {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 210px;
+      margin: 0;
+      padding: 16px;
+      text-align: center;
+      font-weight: 400;
+      cursor: pointer;
+      overflow: hidden;
+      border-radius: 16px;
+      border: 2px dashed rgba(235, 210, 138, .5);
+      background: rgba(255, 255, 255, .04);
+      transition: background .25s, border-color .25s
+    }
+
+    .drop:hover,
+    .drop.over,
+    .drop:focus-visible {
+      background: rgba(255, 255, 255, .09);
+      border-color: var(--gold)
+    }
+
+    .drop-in svg {
+      width: 42px;
+      height: 42px;
+      stroke: var(--gold-soft);
+      fill: none;
+      stroke-width: 1.5
+    }
+
+    .drop-in b {
+      display: block;
+      margin-top: 6px;
+      font-size: 17px;
+      font-weight: 600
+    }
+
+    .drop-in span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px
+    }
+
+    .drop-in small {
+      display: block;
+      margin: 10px auto 0;
+      max-width: 330px;
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.5
+    }
+
+    .up-prev {
+      width: 100%;
+      min-height: 178px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      padding: 12px;
+      background-color: #f8f2e4;
+      background-image: linear-gradient(45deg, #ece2c9 25%, transparent 25%, transparent 75%, #ece2c9 75%), linear-gradient(45deg, #ece2c9 25%, transparent 25%, transparent 75%, #ece2c9 75%);
+      background-size: 16px 16px;
+      background-position: 0 0, 8px 8px
+    }
+
+    .up-prev img {
+      max-width: 100%;
+      max-height: 190px
+    }
+
+    .up-again {
+      text-align: center;
+      font-size: 12.5px;
+      color: var(--muted);
+      margin-top: 8px
+    }
+
+    .up-opts {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin: 14px 2px 0;
+      font-size: 14px
+    }
+
+    .up-opts label {
+      margin: 0;
+      font-weight: 400;
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .up-opts input[type=range] {
+      width: 150px;
+      accent-color: var(--gold)
+    }
+
+    .up-opts input[type=checkbox] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--gold)
+    }
+
+    .pad-tools {
+      margin-top: 14px
+    }
   </style>
 </head>
 
@@ -3162,9 +3298,7 @@
   <div id="cover" role="dialog" aria-modal="true" aria-label="Thiệp mời">
     <div class="cv-grid">
       <div class="cv-text">
-        <p class="cv-top">Thiệp mời số</p>
-        <p class="cv-k">Trân trọng kính mời</p>
-        <h1><span class="a">Dự tiệc</span><span class="b gold-text">Tri Ân</span></h1>
+        <h1><span class="b gold-text">Tri Ân</span></h1>
         <div class="rule" aria-hidden="true"><i></i></div>
         <p class="cv-n">Cô Nguyễn Thị Nhật Hằng</p>
         <p class="cv-r">Nguyên Phó Giám đốc Sở Giáo dục và Đào tạo Thành phố Hồ Chí Minh</p>
@@ -3197,15 +3331,12 @@
       <div class="wrap hero-wrap reveal">
         <div class="hero-grid">
           <div class="hero-text">
-            <p class="kicker"><br>trân trọng kính mời</p>
-            <h1><span class="l1">Dự tiệc</span><span class="l2 gold-text">Tri Ân</span></h1>
+            <h1><span class="l2 gold-text">Tri Ân</span></h1>
             <p class="event">Nghĩa tình ghi nhớ – Dấu ấn đồng hành</p>
             <div class="rule" aria-hidden="true"><i></i></div>
             <p class="to-lbl">Dành tặng</p>
             <p class="who gold-text">Cô Nguyễn Thị Nhật Hằng</p>
             <p class="role">Nguyên Phó Giám đốc Sở Giáo dục và Đào tạo Thành phố Hồ Chí Minh</p>
-            <p class="when glass"><span><span class="ph">[Điền giờ]</span></span><span><span class="ph">[Điền
-                  thứ]</span>, ngày <span class="ph">[Điền ngày/tháng/năm]</span></span></p>
             <p class="hero-cta"><a class="btn btn-gold" href="#rsvp">Gửi lời tri ân</a><a class="btn btn-line"
                 href="#kyyeu">Xem kỷ yếu</a></p>
             <div class="count" id="count" role="timer" aria-label="Đếm ngược tới giờ khai tiệc" hidden>
@@ -3239,10 +3370,8 @@
     </section>
     <div class="band sun" aria-hidden="true"></div>
 
-    <!-- ===== 3. SLIDER ĐIỆN ẢNH — ảnh trong thư mục assets/.
-     Mỗi <figure class="slide"> là một slide: sửa <b> (mốc/năm), <span> (chú thích), alt; thêm/xoá/đổi thứ tự tuỳ ý.
-     Chấm điều hướng tự tạo theo số slide. ===== -->
-    <section id="hanhtrinh">
+    <!-- ===== 3. SLIDER ĐIỆN ẢNH — các slide tự tạo từ ảnh tải lên ở trang quản trị (tab "Ảnh kỷ yếu", chương "Những chặng đường đồng hành"). ===== -->
+    <section id="hanhtrinh" hidden>
       <div class="intro reveal">
         <p class="eyebrow">Điểm nhấn</p>
         <h2 class="sec-title gold-text">Những chặng đường đồng hành</h2>
@@ -3250,44 +3379,7 @@
       </div>
       <div class="show reveal" id="show" role="region" aria-roledescription="carousel" aria-label="Hình ảnh hành trình"
         tabindex="0">
-        <div class="slides" aria-live="off">
-          <figure class="slide" data-year="Một tập thể" data-cap="Đoàn kết, nghĩa tình bền chặt"><img
-              src="assets/toanthe.jpg" alt="Tập thể cán bộ, công chức trước trụ sở cơ quan" width="1800" height="1312">
-          </figure>
-          <figure class="slide" data-year="2021" data-cap="Những buổi gặp mặt ấm áp"><img src="assets/y21a.jpg"
-              alt="Gặp mặt, trao quà tại phòng họp, năm 2021" width="1600" height="1067" loading="lazy"></figure>
-          <figure class="slide" data-year="2021" data-cap="Sẻ chia và gắn kết"><img src="assets/y21b.jpg"
-              alt="Ảnh lưu niệm tại phòng họp, năm 2021" width="1600" height="1089" loading="lazy"></figure>
-          <figure class="slide" data-year="2022" data-cap="Đồng hành cùng ngành giáo dục"><img src="assets/y22a.jpg"
-              alt="Ảnh lưu niệm trước trụ sở, năm 2022" width="1600" height="1129" loading="lazy"></figure>
-          <figure class="slide" data-year="2022" data-cap="Sắc áo dài, sắc màu tự hào"><img src="assets/y22b.jpg"
-              alt="Tập thể trong trang phục áo dài truyền thống, năm 2022" width="1600" height="1070" loading="lazy">
-          </figure>
-          <figure class="slide" data-year="2022" data-cap="Cùng nhau vun đắp"><img src="assets/y22c.jpg"
-              alt="Tập thể tại sự kiện ngoài trời, năm 2022" width="1600" height="1067" loading="lazy"></figure>
-          <figure class="slide" data-year="2023" data-cap="Tôn vinh người làm nghề giáo"><img src="assets/y23a.jpg"
-              alt="Họp mặt kỷ niệm Ngày Nhà giáo Việt Nam, năm 2023" width="1600" height="1221" loading="lazy"></figure>
-          <figure class="slide" data-year="2023" data-cap="Những bó hoa tri ân"><img src="assets/y23b.jpg"
-              alt="Tặng hoa chúc mừng, năm 2023" width="1600" height="1067" loading="lazy"></figure>
-          <figure class="slide" data-year="2023" data-cap="Niềm vui họp mặt"><img src="assets/y23c.jpg"
-              alt="Họp mặt, trao hoa quà, năm 2023" width="1600" height="1067" loading="lazy"></figure>
-          <figure class="slide" data-year="2024" data-cap="Duyên dáng sắc áo dài"><img src="assets/y24a.jpg"
-              alt="Tập thể nữ cán bộ trong áo dài, năm 2024" width="1600" height="1166" loading="lazy"></figure>
-          <figure class="slide" data-year="2024" data-cap="Tình đồng nghiệp trọn vẹn"><img src="assets/y24b.jpg"
-              alt="Ảnh lưu niệm tại sảnh cơ quan, năm 2024" width="1600" height="1157" loading="lazy"></figure>
-          <figure class="slide" data-year="2024" data-cap="Ghi nhận và tôn vinh"><img src="assets/y24c.jpg"
-              alt="Lễ trao tặng, năm 2024" width="1600" height="1195" loading="lazy"></figure>
-          <figure class="slide" data-year="2025" data-cap="Đêm gặp mặt đáng nhớ"><img src="assets/y25a.jpg"
-              alt="Gala dinner, trao quà lưu niệm, năm 2025" width="1600" height="1067" loading="lazy"></figure>
-          <figure class="slide" data-year="2025" data-cap="Rạng rỡ những nụ cười"><img src="assets/y25b.jpg"
-              alt="Gala dinner, tập thể cùng chung vui, năm 2025" width="1600" height="1067" loading="lazy"></figure>
-          <figure class="slide" data-year="2025" data-cap="Chung một niềm tin"><img src="assets/y25c.jpg"
-              alt="Đại hội, ảnh lưu niệm đoàn đại biểu, năm 2025" width="1600" height="1067" loading="lazy"></figure>
-          <figure class="slide" data-year="2025" data-cap="Cùng nhìn về phía trước"><img src="assets/y25d.jpg"
-              alt="Hội nghị tổng kết, ảnh lưu niệm, năm 2025" width="1600" height="1067" loading="lazy"></figure>
-          <figure class="slide" data-year="2025" data-cap="Dấu ấn trong tim mỗi người"><img src="assets/y25e.jpg"
-              alt="Lễ kỷ niệm, năm 2025" width="1600" height="1067" loading="lazy"></figure>
-        </div>
+        <div class="slides" aria-live="off"></div>
         <div class="sbar">
           <button class="sb-btn glass" type="button" id="prev" aria-label="Ảnh trước"><svg viewBox="0 0 24 24"
               aria-hidden="true">
@@ -3438,7 +3530,7 @@
             <label style="display:flex;gap:10px;align-items:flex-start;font-weight:400;cursor:pointer">
               <input type="checkbox" name="consent" value="Đồng ý"
                 style="width:22px;height:22px;margin-top:3px;flex:none;accent-color:var(--gold)">
-              <span>Tôi đồng ý để ban tổ chức đọc hoặc trình chiếu lời tri ân này tại buổi tiệc.</span>
+              <span>Xác nhận gửi lời tri ân.</span>
             </label>
           </div>
           <p class="center"><button class="btn btn-gold" type="submit" id="sendBtn">Gửi lời tri ân</button></p>
@@ -3504,10 +3596,13 @@
             <label class="drop" id="dropZone" for="upFile" tabindex="0">
               <input type="file" id="upFile" accept="image/*" style="position:absolute;width:1px;height:1px;opacity:0">
               <div class="drop-in" id="dropIn">
-                <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 32V8M14 18l10-10 10 10M8 34v6h32v-6" /></svg>
+                <svg viewBox="0 0 48 48" aria-hidden="true">
+                  <path d="M24 32V8M14 18l10-10 10 10M8 34v6h32v-6" />
+                </svg>
                 <b>Chọn ảnh chữ ký</b>
                 <span>hoặc kéo thả ảnh vào đây</span>
-                <small>Nên chụp hoặc quét chữ ký trên giấy trắng, đủ sáng. Phần nền sẽ được tách tự động, chỉ giữ lại nét ký.</small>
+                <small>Nên chụp hoặc quét chữ ký trên giấy trắng, đủ sáng. Phần nền sẽ được tách tự động, chỉ giữ lại
+                  nét ký.</small>
               </div>
               <div class="up-prev" id="upPrev" hidden>
                 <img id="upImg" alt="Chữ ký sau khi tách nền">
@@ -3515,15 +3610,18 @@
             </label>
             <p class="up-again" id="upAgain" hidden>Chạm vào ảnh để chọn ảnh khác</p>
             <div class="up-opts" id="upOpts" hidden>
-              <label class="rng">Độ đậm nét <input type="range" id="upSens" min="0" max="100" value="50" aria-label="Độ đậm nét"></label>
+              <label class="rng">Độ đậm nét <input type="range" id="upSens" min="0" max="100" value="50"
+                  aria-label="Độ đậm nét"></label>
               <label class="chk"><input type="checkbox" id="upKeep"> Giữ màu mực gốc</label>
             </div>
           </div>
-          <div id="paneDraw"><div class="pad-area" id="padArea">
-            <canvas id="padCv" aria-label="Vùng ký tên: dùng ngón tay hoặc chuột để ký" role="img"></canvas>
-            <span class="pad-ph" id="padPh">Ký tên tại đây</span>
-            <i class="pad-line" aria-hidden="true"></i>
-          </div></div>
+          <div id="paneDraw">
+            <div class="pad-area" id="padArea">
+              <canvas id="padCv" aria-label="Vùng ký tên: dùng ngón tay hoặc chuột để ký" role="img"></canvas>
+              <span class="pad-ph" id="padPh">Ký tên tại đây</span>
+              <i class="pad-line" aria-hidden="true"></i>
+            </div>
+          </div>
           <div class="pad-tools">
             <div class="inks" role="radiogroup" aria-label="Màu mực">
               <button type="button" class="ink on" data-c="#0A1830" style="--c:#0A1830" role="radio" aria-checked="true"
@@ -3634,9 +3732,14 @@
       revealEls.forEach(el => io.observe(el));
     } else revealEls.forEach(el => el.classList.add("in"));
 
+    /* ---- Dữ liệu ảnh từ trang quản trị (Google Drive): chương "slide" = Những chặng đường đồng hành; các chương khác = kỷ yếu ---- */
+    const driveImg = (id, w) => (CONFIG.driveUrl || ((i, ww) => "https://lh3.googleusercontent.com/d/" + i + "=w" + ww))(id, w);
+    const YB_EP = CONFIG.signEndpoint || CONFIG.formEndpoint;
+    const YB_DATA = YB_EP ? fetch(YB_EP + (YB_EP.includes("?") ? "&" : "?") + "action=yearbook").then(r => r.json()).then(a => Array.isArray(a) ? a : []).catch(() => []) : Promise.resolve([]);
+
     /* ---- Slider điện ảnh: tự chạy, vuốt / phím mũi tên / chấm điều hướng; tạm dừng khi rê chuột, tab ẩn, ngoài màn hình;
             tắt tự chạy nếu người dùng bật giảm chuyển động ---- */
-    (function () {
+    function initSlider() {
       const box = $("#show"), slides = [...box.querySelectorAll(".slide")], dotsBox = $("#dots");
       slides.forEach(sl => sl.style.setProperty("--img", 'url("' + sl.querySelector("img").getAttribute("src") + '")'));
       const DUR = 6000, reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -3679,14 +3782,28 @@
       if ("IntersectionObserver" in window) new IntersectionObserver(es => { inView = es[0].isIntersecting; sync(); }, { threshold: .3 }).observe(box);
       else inView = true;
       setPP(); go(0);
-    })();
+    }
+    YB_DATA.then(arr => {
+      const items = arr.filter(x => x && x.id && x.c === "slide");
+      if (!items.length) return;
+      /* Tên ảnh viết "Năm | Chú thích" (vd: 2023 | Tôn vinh người làm nghề giáo); không có dấu | thì cả tên là chú thích */
+      const host = $(".slides");
+      items.forEach((x, k) => {
+        const p = String(x.n || "").split("|"), year = p.length > 1 ? p[0].trim() : "", cap = (p.length > 1 ? p.slice(1).join("|") : p[0]).trim();
+        const f = document.createElement("figure"); f.className = "slide"; f.dataset.year = year; f.dataset.cap = cap;
+        const im = new Image(); im.src = driveImg(x.id, 1600); im.alt = cap || "Ảnh hành trình"; im.width = +x.w || 1600; im.height = +x.h || 1067;
+        if (k) im.loading = "lazy";
+        f.appendChild(im); host.appendChild(f);
+      });
+      $("#hanhtrinh").hidden = false;
+      initSlider();
+    });
 
     /* ---- KỶ YẾU SỐ ----
        YEARBOOK: [mã ảnh, rộng, cao] mỗi chương — ảnh nhỏ assets/kyyeu/<chương>/<mã>t.jpg, ảnh lớn <mã>.jpg (tạo tự động từ thư mục hinhanh).
        CHAPTERS: sửa nav (nhãn), title, theme (chủ đề năm, để "" nếu chưa có), intro (lời giới thiệu). */
     const YEARBOOK = /*YB*/{}/*YB*/;
     const CHAPTERS = [
-      { key: "mo", nav: "Dấu ấn", title: "Chân dung & tập thể", theme: "", intro: "Những hình ảnh mở đầu cho hành trình đồng hành." },
       { key: "2021", nav: "2021", title: "Năm 2021", theme: "", intro: "Những khoảnh khắc đáng nhớ của năm 2021." },
       { key: "2022", nav: "2022", title: "Năm 2022", theme: "", intro: "Những khoảnh khắc đáng nhớ của năm 2022." },
       { key: "2023", nav: "2023", title: "Năm 2023", theme: "", intro: "Những khoảnh khắc đáng nhớ của năm 2023." },
@@ -3763,12 +3880,12 @@
       build();
 
       /* --- ảnh tải lên từ trang quản trị (Google Drive): lấy danh sách rồi bổ sung vào các chương --- */
-      const EP = CONFIG.signEndpoint || CONFIG.formEndpoint;
-      if (EP) fetch(EP + (EP.includes("?") ? "&" : "?") + "action=yearbook").then(r => r.json()).then(arr => {
-        if (!Array.isArray(arr) || !arr.length) return;
-        arr.forEach(x => { if (x && x.id && x.c) (YEARBOOK[x.c] = YEARBOOK[x.c] || []).push([String(x.id), +x.w || 1600, +x.h || 1067, 1]); });
+      YB_DATA.then(arr => {
+        const list = arr.filter(x => x && x.id && x.c && x.c !== "slide");
+        if (!list.length) return;
+        list.forEach(x => (YEARBOOK[x.c] = YEARBOOK[x.c] || []).push([String(x.id), +x.w || 1600, +x.h || 1067, 1]));
         build();
-      }).catch(() => { });
+      });
 
       /* --- xem ảnh toàn màn hình: vuốt, phím mũi tên, Esc --- */
       function show() {
