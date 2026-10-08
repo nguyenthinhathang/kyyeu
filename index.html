@@ -3718,6 +3718,50 @@
 
     const $ = s => document.querySelector(s);
     const toast = msg => { const t = $("#toast"); t.textContent = msg; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 2400); };
+    /* ---- Chống tải ảnh: chặn chuột phải / kéo thả / giữ lâu; muốn tải phải nhập mật khẩu (kiểm tra bằng mã băm SHA-256, không lưu mật khẩu thô) ---- */
+    (function () {
+      const HASH = "a320480f534776bddb5cdb54b1e93d210a3c7d199e80a23c1b2178497b184c76";
+      const st = document.createElement("style");
+      st.textContent = "img,canvas{-webkit-user-drag:none;-webkit-touch-callout:none}img{user-select:none;-webkit-user-select:none}" +
+        "#dlGate{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(3,8,22,.78);backdrop-filter:blur(6px)}" +
+        "#dlGate.on{display:flex}#dlGate form{width:min(380px,100%);padding:26px 22px;border-radius:20px;text-align:center;color:#E9EEF8;background:linear-gradient(160deg,#0B1A3A,#07122B);border:1px solid rgba(235,210,138,.45);box-shadow:0 24px 60px rgba(0,0,0,.5)}" +
+        "#dlGate h3{font:italic 600 26px 'Cormorant Garamond',Georgia,serif;color:#EBD28A;margin-bottom:6px}#dlGate p{font-size:14px;color:#AEBAD6;margin-bottom:14px}" +
+        "#dlGate input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(235,210,138,.4);background:rgba(255,255,255,.08);color:#fff;font:inherit;text-align:center;letter-spacing:.2em}" +
+        "#dlGate .er{min-height:20px;margin:8px 0;font-size:13px;color:#ffa59b}#dlGate .rw{display:flex;gap:8px;justify-content:center}" +
+        "#dlGate button{min-height:42px;padding:8px 20px;border-radius:999px;border:1px solid #D4AF37;background:rgba(255,255,255,.08);color:#EBD28A;font:500 14px inherit;cursor:pointer}" +
+        "#dlGate button.ok{background:linear-gradient(120deg,#F7E7A6,#D4AF37 45%,#B8901F 70%,#F1DB8C);color:#0A1830;border-color:transparent;font-weight:600}";
+      document.head.appendChild(st);
+      const box = document.createElement("div"); box.id = "dlGate"; box.setAttribute("role", "dialog"); box.setAttribute("aria-modal", "true");
+      box.innerHTML = '<form><h3>Tải ảnh về máy</h3><p>Vui lòng nhập mật khẩu để tải ảnh.</p><input type="password" id="dlPw" autocomplete="off" placeholder="Mật khẩu" aria-label="Mật khẩu tải ảnh"><div class="er" id="dlEr" aria-live="polite"></div><div class="rw"><button type="button" id="dlNo">Hủy</button><button type="submit" class="ok">Xác nhận</button></div></form>';
+      document.body.appendChild(box);
+      let cb = null; const pw = box.querySelector("#dlPw"), er = box.querySelector("#dlEr");
+      const close = () => { box.classList.remove("on"); pw.value = ""; er.textContent = ""; cb = null; };
+      const sha = async s => { const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, "0")).join(""); };
+      function ask(fn) { cb = fn; box.classList.add("on"); setTimeout(() => pw.focus(), 50); }
+      box.querySelector("#dlNo").onclick = close; box.addEventListener("click", e => { if (e.target === box) close(); });
+      document.addEventListener("keydown", e => { if (e.key === "Escape" && box.classList.contains("on")) { e.stopPropagation(); close(); } }, true);
+      box.querySelector("form").addEventListener("submit", async e => {
+        e.preventDefault();
+        if (!(window.crypto && crypto.subtle)) { er.textContent = "Trình duyệt chưa hỗ trợ, hãy mở bằng https."; return; }
+        if (await sha(pw.value.trim()) === HASH) { const f = cb; close(); if (f) f(); }
+        else { er.textContent = "Mật khẩu chưa đúng."; pw.select(); }
+      });
+      /* chặn lưu ảnh bằng chuột phải, kéo thả, giữ lâu trên điện thoại */
+      document.addEventListener("contextmenu", e => { if (e.target.closest && e.target.closest("img,canvas,#lb,.cv-photo,.portrait,#wall")) e.preventDefault(); });
+      document.addEventListener("dragstart", e => { if (e.target.tagName === "IMG") e.preventDefault(); });
+      /* nút tải ảnh kỷ yếu + tải bức tranh: hỏi mật khẩu trước */
+      document.addEventListener("click", e => {
+        const b = e.target.closest && e.target.closest("#sgSave,#lbDl"); if (!b || b.dataset.ok) return;
+        e.preventDefault(); e.stopImmediatePropagation();
+        ask(async () => {
+          if (b.id === "sgSave") { b.dataset.ok = "1"; b.click(); delete b.dataset.ok; return; }
+          const url = b.href, name = b.getAttribute("download") || "ky-yeu.jpg";
+          try { const bl = await (await fetch(url, { mode: "cors" })).blob(), u = URL.createObjectURL(bl), a = document.createElement("a"); a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 60000); toast("Đang tải ảnh về máy..."); }
+          catch (er2) { window.open(url, "_blank", "noopener"); }
+        });
+      }, true);
+    })();
+
 
     /* ---- 1. Mở thiệp ---- */
     $("#openBtn").addEventListener("click", () => {
@@ -3978,7 +4022,7 @@
     (function () {
       const wall = $("#wall"), layer = $("#sigs"), bg = $("#wallBg"), cv = $("#padCv"), ctx = cv.getContext("2d");
       const area = $("#padArea"), KEY = "chuky_v1", LASTKEY = "chuky_last", ENDPOINT = CONFIG.signEndpoint || CONFIG.formEndpoint;
-      const W = 1600, H = 1069;   // kích thước ảnh nền (px)
+      let W = 1600, H = 1069, WALL_ID = "";   // kích thước ảnh nền (px); đổi theo bức tranh quản trị chọn
       let sigs = [], ink = "#0A1830", down = false, drawn = false, last = null, mid = null, bb = null, cssW = 0;
       if (!ENDPOINT) $("#sgNote").hidden = false;
 
@@ -4179,6 +4223,12 @@
       const merge = arr => { const ids = new Set(sigs.map(x => x.id)); arr.forEach(x => { if (x && x.id && x.img && !ids.has(x.id)) { sigs.push({ id: String(x.id), name: x.name || "", img: x.img, t: +x.t || Date.now(), x: x.x, y: x.y, s: x.s, r: x.r, z: x.z }); ids.add(x.id); } }); };
       try { merge(JSON.parse(localStorage.getItem(KEY) || "[]")); } catch (e) { }
       render();
+      /* bức tranh nền do quản trị chọn (nếu có) */
+      if (ENDPOINT) fetch(ENDPOINT + (ENDPOINT.includes("?") ? "&" : "?") + "action=wall").then(r => r.json()).then(j => {
+        if (!j || !j.id) return;
+        WALL_ID = j.id; W = +j.w || W; H = +j.h || H; wall.style.aspectRatio = W + " / " + H;
+        bg.removeAttribute("loading"); bg.width = W; bg.height = H; bg.src = driveImg(j.id, 1800); render();
+      }).catch(() => { });
       const listUrl = ENDPOINT + (ENDPOINT.includes("?") ? "&" : "?") + "action=list";
       const noServer = () => { const n = $("#sgNote"); n.textContent = "Không kết nối được máy chủ lưu chữ ký: chữ ký chỉ hiển thị trên thiết bị này và người khác sẽ không thấy."; n.hidden = false; };
       if (ENDPOINT) fetch(listUrl).then(r => r.json()).then(arr => { if (Array.isArray(arr)) { sigs = []; merge(arr); saveLocal(); render(); $("#sgNote").hidden = true; } else noServer(); }).catch(noServer);
@@ -4230,7 +4280,13 @@
         const sc = document.createElement("script"); sc.src = "assets/chuky-nen.js";
         sc.onload = () => res(window.CHUKY_BG); sc.onerror = () => rej(new Error("bg")); document.head.appendChild(sc);
       });
-      async function loadBgImg() { const im = await loadImg(await bgReady()); if (!im) throw new Error("bg"); return im; }
+      async function loadBgImg() {
+        if (WALL_ID) {   /* tranh nền tuỳ chọn: lấy dạng dữ liệu nhúng để canvas không bị chặn xuất ảnh */
+          const j = await fetch(ENDPOINT + (ENDPOINT.includes("?") ? "&" : "?") + "action=walldata").then(r => r.json());
+          const im = j && j.data ? await loadImg(j.data) : null; if (im) return im;
+        }
+        const im = await loadImg(await bgReady()); if (!im) throw new Error("bg"); return im;
+      }
       $("#sgSave").onclick = async () => {
         try {
           const c = document.createElement("canvas"); c.width = W; c.height = H; const g = c.getContext("2d");
