@@ -3612,7 +3612,9 @@
       /* BỨC TRANH CHỮ KÝ: dán URL Google Apps Script (xem file google-apps-script.gs). Có thể dùng chung URL với formEndpoint.
          Để trống thì chữ ký chỉ lưu trên thiết bị người ký (chế độ thử). */
       signEndpoint: "https://script.google.com/macros/s/AKfycbzkqElcc2fWKD7gQB0NkavR7de20ZWBWP1cW_sBogn56cAL0tFlPWwP3jVG-8ZWcypF8g/exec",
-      fieldMap: { name: "name", org: "org", message: "message", consent: "consent" }
+      fieldMap: { name: "name", org: "org", message: "message", consent: "consent" },
+      /* Địa chỉ ảnh kỷ yếu tải lên từ trang quản trị (lưu trong Google Drive). Mặc định dùng lh3.googleusercontent.com. */
+      driveUrl: null   // (id, chiềuRộng) => "https://..."; để null để dùng mặc định
     };
 
     const $ = s => document.querySelector(s);
@@ -3694,69 +3696,90 @@
     (function () {
       const IMG = "assets/kyyeu/", FIRST = 18, STEP = 36;
       const root = $("#chapters"), rail = $("#chnav");
-      const chaps = CHAPTERS.filter(c => (YEARBOOK[c.key] || []).length);
-      $("#ybTotal").textContent = chaps.reduce((s, c) => s + YEARBOOK[c.key].length, 0);
-      $("#ybChap").textContent = chaps.length;
+      /* Ảnh trong kho GitHub: [mã, rộng, cao]. Ảnh tải lên từ trang quản trị (Drive): [id, rộng, cao, 1]. */
+      const dUrl = (id, w) => (CONFIG.driveUrl || ((i, ww) => "https://lh3.googleusercontent.com/d/" + i + "=w" + ww))(id, w);
+      const srcT = (c, it) => it[3] ? dUrl(it[0], 560) : IMG + c.key + "/" + it[0] + "t.jpg";
+      const srcF = (c, it) => it[3] ? dUrl(it[0], 1800) : IMG + c.key + "/" + it[0] + ".jpg";
+      let chaps = [], spy = null;
+      const lb = $("#lb"), lbImg = $("#lbImg"); let cur = null, idx = 0, opener = null;
 
-      /* --- dựng từng chương --- */
-      chaps.forEach(c => {
-        const list = YEARBOOK[c.key]; let shown = 0;
-        const art = document.createElement("article"); art.className = "chap"; art.id = "ch-" + c.key;
-        const isYear = /^\d{4}$/.test(c.key);
-        art.innerHTML = '<header class="chap-h"><span class="yr' + (isYear ? '' : ' txt') + '" aria-hidden="true">' + (isYear ? c.key : c.nav) + '</span>' +
-          '<h3 class="gold-text">' + c.title + '</h3>' +
-          '<p>' + (c.theme ? c.theme + ' – ' : '') + c.intro + '</p>' +
-          '<span class="cnt glass">' + list.length + ' ảnh</span></header><div class="grid"></div>';
-        const grid = art.querySelector(".grid");
-        const more = document.createElement("button"); more.type = "button"; more.className = "btn btn-line more";
-        art.appendChild(more); root.appendChild(art);
-        function add(k) {
-          const end = Math.min(list.length, shown + k), frag = document.createDocumentFragment();
-          for (let i = shown; i < end; i++) {
-            const [id, w, h] = list[i];
-            const b = document.createElement("button"); b.type = "button"; b.className = "it";
-            b.style.setProperty("--r", (w / h).toFixed(3));
-            b.setAttribute("aria-label", "Xem ảnh " + (i + 1) + " – " + c.nav);
-            const im = new Image(); im.alt = "Ảnh kỷ yếu " + c.nav + ", số " + (i + 1);
-            im.loading = "lazy"; im.decoding = "async"; im.width = 560; im.height = Math.round(560 * h / w);
-            im.addEventListener("load", () => im.classList.add("ld"));
-            im.src = IMG + c.key + "/" + id + "t.jpg"; if (im.complete && im.naturalWidth) im.classList.add("ld");
-            b.appendChild(im); b.addEventListener("click", () => openLB(c, i, b)); frag.appendChild(b);
-          }
-          grid.appendChild(frag); shown = end;
-          more.classList.toggle("hide", shown >= list.length);
-          more.textContent = "Xem thêm " + Math.min(STEP, list.length - shown) + " ảnh  (" + shown + "/" + list.length + ")";
-        }
-        more.onclick = () => add(STEP); add(FIRST);
-
-        const a = document.createElement("a"); a.className = "pill"; a.href = "#ch-" + c.key;
-        a.innerHTML = c.nav + "<small>" + list.length + "</small>"; rail.appendChild(a); c.pill = a; c.el = art;
-      });
-
-      /* --- scrollspy: tô sáng chương đang xem --- */
-      if ("IntersectionObserver" in window) {
-        const spy = new IntersectionObserver(es => es.forEach(e => {
-          if (!e.isIntersecting) return;
-          chaps.forEach(c => c.pill.classList.toggle("on", c.el === e.target));
-          const p = chaps.find(c => c.el === e.target).pill;
-          rail.scrollTo({ left: p.offsetLeft - rail.clientWidth / 2 + p.offsetWidth / 2, behavior: "smooth" });
-        }), { rootMargin: "-35% 0px -60% 0px" });
-        chaps.forEach(c => spy.observe(c.el));
+      /* danh sách chương: các chương khai báo trong CHAPTERS + chương mới tạo từ trang quản trị (vd 2026) */
+      function allChapters() {
+        const extra = Object.keys(YEARBOOK).filter(k => !CHAPTERS.some(c => c.key === k)).sort();
+        return CHAPTERS.concat(extra.map(k => ({ key: k, nav: k, title: /^\d{4}$/.test(k) ? "Năm " + k : k, theme: "", intro: "Những khoảnh khắc đáng nhớ." })));
       }
+
+      /* --- dựng (hoặc dựng lại) toàn bộ các chương --- */
+      function build() {
+        if (spy) spy.disconnect();
+        root.textContent = ""; rail.textContent = "";
+        chaps = allChapters().filter(c => (YEARBOOK[c.key] || []).length);
+        $("#ybTotal").textContent = chaps.reduce((s, c) => s + YEARBOOK[c.key].length, 0);
+        $("#ybChap").textContent = chaps.length;
+        chaps.forEach(c => {
+          const list = YEARBOOK[c.key]; let shown = 0;
+          const art = document.createElement("article"); art.className = "chap"; art.id = "ch-" + c.key;
+          const isYear = /^\d{4}$/.test(c.key);
+          art.innerHTML = '<header class="chap-h"><span class="yr' + (isYear ? '' : ' txt') + '" aria-hidden="true"></span><h3 class="gold-text"></h3><p></p><span class="cnt glass">' + list.length + ' ảnh</span></header><div class="grid"></div>';
+          art.querySelector(".yr").textContent = isYear ? c.key : c.nav;
+          art.querySelector("h3").textContent = c.title;
+          art.querySelector("p").textContent = (c.theme ? c.theme + " – " : "") + c.intro;
+          const grid = art.querySelector(".grid");
+          const more = document.createElement("button"); more.type = "button"; more.className = "btn btn-line more";
+          art.appendChild(more); root.appendChild(art);
+          function add(k) {
+            const end = Math.min(list.length, shown + k), frag = document.createDocumentFragment();
+            for (let i = shown; i < end; i++) {
+              const it = list[i], w = it[1], h = it[2];
+              const b = document.createElement("button"); b.type = "button"; b.className = "it";
+              b.style.setProperty("--r", (w / h).toFixed(3));
+              b.setAttribute("aria-label", "Xem ảnh " + (i + 1) + " – " + c.nav);
+              const im = new Image(); im.alt = "Ảnh kỷ yếu " + c.nav + ", số " + (i + 1);
+              im.loading = "lazy"; im.decoding = "async"; im.width = 560; im.height = Math.round(560 * h / w);
+              im.addEventListener("load", () => im.classList.add("ld"));
+              im.src = srcT(c, it); if (im.complete && im.naturalWidth) im.classList.add("ld");
+              b.appendChild(im); b.addEventListener("click", () => openLB(c, i, b)); frag.appendChild(b);
+            }
+            grid.appendChild(frag); shown = end;
+            more.classList.toggle("hide", shown >= list.length);
+            more.textContent = "Xem thêm " + Math.min(STEP, list.length - shown) + " ảnh  (" + shown + "/" + list.length + ")";
+          }
+          more.onclick = () => add(STEP); add(FIRST);
+          const a = document.createElement("a"); a.className = "pill"; a.href = "#ch-" + c.key;
+          a.innerHTML = c.nav + "<small>" + list.length + "</small>"; rail.appendChild(a); c.pill = a; c.el = art;
+        });
+        /* scrollspy: tô sáng chương đang xem */
+        if ("IntersectionObserver" in window) {
+          spy = new IntersectionObserver(es => es.forEach(e => {
+            if (!e.isIntersecting) return;
+            chaps.forEach(c => c.pill.classList.toggle("on", c.el === e.target));
+            const p = chaps.find(c => c.el === e.target).pill;
+            rail.scrollTo({ left: p.offsetLeft - rail.clientWidth / 2 + p.offsetWidth / 2, behavior: "smooth" });
+          }), { rootMargin: "-35% 0px -60% 0px" });
+          chaps.forEach(c => spy.observe(c.el));
+        }
+      }
+      build();
+
+      /* --- ảnh tải lên từ trang quản trị (Google Drive): lấy danh sách rồi bổ sung vào các chương --- */
+      const EP = CONFIG.signEndpoint || CONFIG.formEndpoint;
+      if (EP) fetch(EP + (EP.includes("?") ? "&" : "?") + "action=yearbook").then(r => r.json()).then(arr => {
+        if (!Array.isArray(arr) || !arr.length) return;
+        arr.forEach(x => { if (x && x.id && x.c) (YEARBOOK[x.c] = YEARBOOK[x.c] || []).push([String(x.id), +x.w || 1600, +x.h || 1067, 1]); });
+        build();
+      }).catch(() => { });
 
       /* --- xem ảnh toàn màn hình: vuốt, phím mũi tên, Esc --- */
-      const lb = $("#lb"), lbImg = $("#lbImg"); let cur = null, idx = 0, opener = null;
       function show() {
-        const list = YEARBOOK[cur.key], id = list[idx][0];
-        const base = IMG + cur.key + "/" + id, full = base + ".jpg";
-        lbImg.dataset.want = full; lbImg.src = base + "t.jpg"; lbImg.alt = "Ảnh kỷ yếu " + cur.nav + ", số " + (idx + 1);
+        const list = YEARBOOK[cur.key], it = list[idx], full = srcF(cur, it);
+        lbImg.dataset.want = full; lbImg.src = srcT(cur, it); lbImg.alt = "Ảnh kỷ yếu " + cur.nav + ", số " + (idx + 1);
         const pre = new Image(); pre.onload = () => { if (lbImg.dataset.want === full) lbImg.src = full; }; pre.src = full;
         $("#lbInfo").innerHTML = '<b class="gold-text">' + cur.nav + '</b>' + (idx + 1) + " / " + list.length;
-        const dl = $("#lbDl"); dl.href = full; dl.setAttribute("download", "ky-yeu-" + cur.key + "-" + id + ".jpg");
-        [idx - 1, idx + 1].forEach(k => { const r = list[(k + list.length) % list.length]; new Image().src = IMG + cur.key + "/" + r[0] + ".jpg"; });
+        const dl = $("#lbDl"); dl.href = full; dl.setAttribute("download", "ky-yeu-" + cur.key + "-" + (idx + 1) + ".jpg");
+        [idx - 1, idx + 1].forEach(k => { new Image().src = srcF(cur, list[(k + list.length) % list.length]); });
       }
       function openLB(c, i, btn) { cur = c; idx = i; opener = btn; lb.hidden = false; document.body.classList.add("lbopen"); show(); $("#lbClose").focus(); }
-      function closeLB() { lb.hidden = true; document.body.classList.remove("lbopen"); if (opener) opener.focus(); }
+      function closeLB() { lb.hidden = true; document.body.classList.remove("lbopen"); if (opener && document.contains(opener)) opener.focus(); }
       const step = d => { const n = YEARBOOK[cur.key].length; idx = (idx + d + n) % n; show(); };
       $("#lbClose").onclick = closeLB; $("#lbPrev").onclick = () => step(-1); $("#lbNext").onclick = () => step(1);
       lb.addEventListener("click", e => { if (e.target === lb) closeLB(); });
