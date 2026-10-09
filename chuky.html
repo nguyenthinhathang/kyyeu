@@ -3203,9 +3203,7 @@
     html[data-solo] #cover, html[data-solo] .nav, html[data-solo] .skip { display: none !important; }
     html[data-solo="chuky"] main > section:not(#chuky),
     html[data-solo="loitri"] main > section:not(#rsvp) { display: none !important; }
-    html[data-solo] main { padding-top: 64px; }
-    #soloBack { position: fixed; z-index: 60; left: 14px; top: 14px; display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: 999px; font: 500 13.5px/1 var(--sans, system-ui); color: #EBD28A; text-decoration: none; background: rgba(7, 18, 43, .72); border: 1px solid rgba(235, 210, 138, .5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
-    #soloBack:hover { background: rgba(27, 63, 160, .6); }
+    html[data-solo] main { padding-top: 24px; }
   </style>
 </head>
 
@@ -3218,7 +3216,6 @@
       if (!s) return;
       document.body.classList.remove("locked");
       document.title = s === "chuky" ? "Bức tranh chữ ký tri ân" : "Gửi lời yêu thương";
-      var a = document.createElement("a"); a.id = "soloBack"; a.href = "./"; a.textContent = "← Trang chủ"; document.body.appendChild(a);
     })();
   </script>
   <a class="skip" href="#hero">Bỏ qua, tới nội dung chính</a>
