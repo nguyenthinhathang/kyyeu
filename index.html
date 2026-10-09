@@ -484,6 +484,7 @@
     }
 
     #cover .cv-text {
+      container-type: inline-size;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -578,10 +579,13 @@
 
     #cover h1 .b {
       display: block;
-      font-size: clamp(58px, 17vw, 128px);
-      font-weight: 700;
-      letter-spacing: .06em;
-      text-transform: uppercase;
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: clamp(15px, 6.2cqw, 46px);   /* mỗi câu đúng 1 dòng, tự co theo bề rộng cột */
+      font-weight: 600;
+      letter-spacing: .01em;
+      line-height: 1.35;
+      text-transform: none;
       white-space: nowrap
     }
 
@@ -778,10 +782,11 @@
 
     #hero .event {
       font-family: var(--font-serif);
-      font-size: clamp(20px, 4.6vw, 26px);
+      font-size: clamp(24px, 5.4vw, 34px);
+      line-height: 1.35;
       font-style: italic;
       color: var(--text);
-      margin-top: 12px
+      margin-top: 0
     }
 
     .rule {
@@ -1663,11 +1668,16 @@
       overflow-x: auto;
       padding: 8px;
       border-radius: 999px;
-      max-width: 640px;
+      width: fit-content;
+      max-width: min(640px, 100%);
       margin: 0 auto;
       scrollbar-width: none;
       -webkit-overflow-scrolling: touch
     }
+
+    /* căn giữa các năm khi đủ chỗ; nếu quá dài vẫn vuốt ngang được */
+    .chnav .rail>:first-child { margin-left: auto }
+    .chnav .rail>:last-child { margin-right: auto }
 
     .chnav .rail::-webkit-scrollbar {
       display: none
@@ -3172,10 +3182,45 @@
     .pad-tools {
       margin-top: 14px
     }
+    /* ---- Ô tải ảnh chụp chung (nhiều ảnh) ---- */
+    .field .opt { font-weight: 400; font-size: .85em; color: var(--muted, #AEBAD6); }
+    .pdrop { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 124px; padding: 18px 14px; margin-top: 6px; text-align: center; cursor: pointer; border-radius: 18px; border: 1.5px dashed rgba(235, 210, 138, .6); background: linear-gradient(160deg, rgba(255, 255, 255, .07), rgba(27, 63, 160, .12)); transition: background .25s, border-color .25s, transform .25s; }
+    .pdrop svg { width: 38px; height: 38px; fill: none; stroke: #EBD28A; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; margin-bottom: 2px; }
+    .pdrop b { font-weight: 600; font-size: 15.5px; color: var(--text, #E9EEF8); }
+    .pdrop span { font-size: 12.5px; color: var(--muted, #AEBAD6); }
+    .pdrop:hover, .pdrop.over, .pdrop:focus-visible { border-color: #D4AF37; background: linear-gradient(160deg, rgba(255, 255, 255, .12), rgba(27, 63, 160, .22)); outline: none; }
+    .pdrop.over { transform: scale(1.01); }
+    .pdrop.full { display: none; }
+    .pgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 10px; margin-top: 10px; }
+    .pgrid:empty { display: none; }
+    .pth { position: relative; aspect-ratio: 1; border-radius: 14px; overflow: hidden; border: 1px solid rgba(235, 210, 138, .5); box-shadow: 0 8px 18px rgba(0, 0, 0, .3); animation: pthIn .35s ease both; }
+    .pth img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .pth.load { display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, .06); font-size: 12px; color: var(--muted, #AEBAD6); }
+    .pth button { position: absolute; right: 5px; top: 5px; width: 26px; height: 26px; border-radius: 50%; border: 0; cursor: pointer; font: 600 16px/1 system-ui; color: #fff; background: rgba(7, 18, 43, .78); }
+    .pth button:hover { background: #b33; }
+    @keyframes pthIn { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: none; } }
+    /* ---- Trang riêng (chuky.html, loitri-an.html hoặc ?trang=chuky / ?trang=loitri): chỉ hiện một phần ---- */
+    html[data-solo] #cover, html[data-solo] .nav, html[data-solo] .skip { display: none !important; }
+    html[data-solo="chuky"] main > section:not(#chuky),
+    html[data-solo="loitri"] main > section:not(#rsvp) { display: none !important; }
+    html[data-solo] main { padding-top: 64px; }
+    #soloBack { position: fixed; z-index: 60; left: 14px; top: 14px; display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: 999px; font: 500 13.5px/1 var(--sans, system-ui); color: #EBD28A; text-decoration: none; background: rgba(7, 18, 43, .72); border: 1px solid rgba(235, 210, 138, .5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+    #soloBack:hover { background: rgba(27, 63, 160, .6); }
   </style>
 </head>
 
 <body class="locked">
+  <script>
+    /* Trang riêng: đọc từ thuộc tính data-solo (file chuky.html / loitri-an.html) hoặc ?trang=chuky|loitri */
+    (function () {
+      var h = document.documentElement, s = h.dataset.solo;
+      if (!s) { var q = new URLSearchParams(location.search).get("trang"); s = q === "chuky" ? "chuky" : (q === "loitri" || q === "loitri-an") ? "loitri" : ""; if (s) h.dataset.solo = s; }
+      if (!s) return;
+      document.body.classList.remove("locked");
+      document.title = s === "chuky" ? "Bức tranh chữ ký tri ân" : "Gửi lời yêu thương";
+      var a = document.createElement("a"); a.id = "soloBack"; a.href = "./"; a.textContent = "← Trang chủ"; document.body.appendChild(a);
+    })();
+  </script>
   <a class="skip" href="#hero">Bỏ qua, tới nội dung chính</a>
   <nav class="nav glass" aria-label="Điều hướng nhanh">
     <a href="#hero">Thư mời</a><a href="#kyyeu">Kỷ yếu</a><a href="#loingo">Lời ngỏ</a><a href="#rsvp">Tri ân</a>
@@ -3298,7 +3343,7 @@
   <div id="cover" role="dialog" aria-modal="true" aria-label="Thiệp mời">
     <div class="cv-grid">
       <div class="cv-text">
-        <h1><span class="b gold-text">Tri Ân</span></h1>
+        <h1 aria-label="Trí sáng tâm trong ngời chất ngọc; Bền lòng chặt dạ dựng tương lai"><span class="b gold-text">Trí sáng tâm trong ngời chất ngọc;<br>Bền lòng chặt dạ dựng tương lai</span></h1>
         <div class="rule" aria-hidden="true"><i></i></div>
         <p class="cv-n">Cô Nguyễn Thị Nhật Hằng</p>
         <p class="cv-r">Nguyên Phó Giám đốc Sở Giáo dục và Đào tạo Thành phố Hồ Chí Minh</p>
@@ -3306,7 +3351,6 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
             <path d="M5 12h14M13 6l6 6-6 6" />
           </svg></button>
-        <p class="cv-meta">Kỷ yếu số · 2021 – 2025</p>
       </div>
       <div class="cv-art" aria-hidden="true">
         <i class="cv-ring"></i><i class="cv-disc"></i>
@@ -3331,8 +3375,8 @@
       <div class="wrap hero-wrap reveal">
         <div class="hero-grid">
           <div class="hero-text">
-            <h1><span class="l2 gold-text">Tri Ân</span></h1>
-            <p class="event">Nghĩa tình ghi nhớ – Dấu ấn đồng hành</p>
+            <h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap">Tri Ân Cô Nguyễn Thị Nhật Hằng</h1>
+            <p class="event">Trí sáng tâm trong ngời chất ngọc;<br>Bền lòng chặt dạ dựng tương lai</p>
             <div class="rule" aria-hidden="true"><i></i></div>
             <p class="to-lbl">Dành tặng</p>
             <p class="who gold-text">Cô Nguyễn Thị Nhật Hằng</p>
@@ -3409,7 +3453,7 @@
     <section id="kyyeu">
       <div class="intro reveal">
         <p class="eyebrow">Kỷ yếu số</p>
-        <h2 class="sec-title gold-text">Hành trình 2021 – 2025</h2>
+        <h2 class="sec-title gold-text">Hành trình 2021 – 2026</h2>
         <svg class="lotus" aria-hidden="true">
           <use href="#lotus" />
         </svg>
@@ -3491,8 +3535,8 @@
         <use href="#drum" />
       </svg>
       <div class="wrap reveal">
-        <p class="eyebrow">Lời tri ân</p>
-        <h2 class="sec-title gold-text">Gửi lời tri ân</h2>
+        <p class="eyebrow">Lời nhắn gửi</p>
+        <h2 class="sec-title gold-text">Gửi lời yêu thương</h2>
         <svg class="lotus" aria-hidden="true">
           <use href="#lotus" />
         </svg>
@@ -3520,20 +3564,31 @@
             <input type="text" id="f-org" name="org" autocomplete="organization">
           </div>
           <div class="field">
-            <label for="f-msg">Lời tri ân gửi tới Cô Nguyễn Thị Nhật Hằng *</label>
+            <label for="f-msg">Lời nhắn gửi tới Cô Nguyễn Thị Nhật Hằng *</label>
             <textarea id="f-msg" name="message" maxlength="1000" style="min-height:140px"
-              placeholder="Quý vị hãy gửi đôi dòng tri ân, kỷ niệm hoặc lời chúc..."></textarea>
+              placeholder="Quý vị hãy gửi đôi dòng yêu thương, kỷ niệm hoặc lời chúc..."></textarea>
             <p class="dev-note" style="text-align:right;margin-top:4px"><span id="f-count">0</span>/1000</p>
-            <p class="err" id="e-msg">Vui lòng nhập lời tri ân (tối thiểu 5 ký tự).</p>
+            <p class="err" id="e-msg">Vui lòng nhập lời nhắn gửi (tối thiểu 5 ký tự).</p>
+          </div>
+          <div class="field">
+            <label for="f-photo">Gửi hình chụp chung cùng Cô <span class="opt">(không bắt buộc · tối đa 15 ảnh)</span></label>
+            <label class="pdrop" id="photoDrop" for="f-photo" tabindex="0">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h1.2l1.1-1.6A1.5 1.5 0 0 1 10 3.8h4a1.5 1.5 0 0 1 1.2.6L16.3 6h1.2A2.5 2.5 0 0 1 20 8.5v8A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5z"/><circle cx="12" cy="12.5" r="3.4"/></svg>
+              <b>Chọn ảnh hoặc kéo thả vào đây</b>
+              <span>Có thể chọn nhiều ảnh cùng lúc · JPG, PNG</span>
+            </label>
+            <input type="file" id="f-photo" accept="image/*" multiple style="position:absolute;width:1px;height:1px;opacity:0;padding:0;border:0">
+            <div class="pgrid" id="photoGrid" aria-live="polite"></div>
+            <p class="err" id="e-photo">Không đọc được ảnh này, vui lòng chọn ảnh khác.</p>
           </div>
           <div class="field">
             <label style="display:flex;gap:10px;align-items:flex-start;font-weight:400;cursor:pointer">
               <input type="checkbox" name="consent" value="Đồng ý"
                 style="width:22px;height:22px;margin-top:3px;flex:none;accent-color:var(--gold)">
-              <span>Xác nhận gửi lời tri ân.</span>
+              <span>Xác nhận gửi lời yêu thương.</span>
             </label>
           </div>
-          <p class="center"><button class="btn btn-gold" type="submit" id="sendBtn">Gửi lời tri ân</button></p>
+          <p class="center"><button class="btn btn-gold" type="submit" id="sendBtn">Gửi lời yêu thương</button></p>
           <p class="dev-note">Trường hợp lỗi mạng, vui lòng liên hệ trực tiếp theo thông tin ở cuối trang.</p>
         </form>
 
@@ -3542,7 +3597,7 @@
             <use href="#lotus" />
           </svg>
           <h3 class="gold-text">Trân trọng cảm ơn quý vị</h3>
-          <p>Lời tri ân của quý vị đã được gửi tới Ban tổ chức.</p>
+          <p>Lời yêu thương của quý vị đã được gửi tới Ban tổ chức.</p>
         </div>
       </div>
     </section>
@@ -3849,11 +3904,12 @@
        CHAPTERS: sửa nav (nhãn), title, theme (chủ đề năm, để "" nếu chưa có), intro (lời giới thiệu). */
     const YEARBOOK = /*YB*/{}/*YB*/;
     const CHAPTERS = [
-      { key: "2021", nav: "2021", title: "Năm 2021", theme: "", intro: "Những khoảnh khắc đáng nhớ của năm 2021." },
-      { key: "2022", nav: "2022", title: "Năm 2022", theme: "", intro: "Những khoảnh khắc đáng nhớ của năm 2022." },
-      { key: "2023", nav: "2023", title: "Năm 2023", theme: "", intro: "Những khoảnh khắc đáng nhớ của năm 2023." },
+      { key: "2026", nav: "2026", title: "Năm 2026", theme: "", intro: "Những khoảnh khắc đáng nhớ của năm 2026." },
+      { key: "2025", nav: "2025", title: "Năm 2025", theme: "", intro: "Những khoảnh khắc đáng nhớ của năm 2025." },
       { key: "2024", nav: "2024", title: "Năm 2024", theme: "", intro: "Những khoảnh khắc đáng nhớ của năm 2024." },
-      { key: "2025", nav: "2025", title: "Năm 2025", theme: "", intro: "Những khoảnh khắc đáng nhớ của năm 2025." }
+      { key: "2023", nav: "2023", title: "Năm 2023", theme: "", intro: "Những khoảnh khắc đáng nhớ của năm 2023." },
+      { key: "2022", nav: "2022", title: "Năm 2022", theme: "", intro: "Những khoảnh khắc đáng nhớ của năm 2022." },
+      { key: "2021", nav: "2021", title: "Năm 2021", theme: "", intro: "Những khoảnh khắc đáng nhớ của năm 2021." }
     ];
     (function () {
       const IMG = "assets/kyyeu/", FIRST = 18, STEP = 36;
@@ -3868,7 +3924,10 @@
       /* danh sách chương: các chương khai báo trong CHAPTERS + chương mới tạo từ trang quản trị (vd 2026) */
       function allChapters() {
         const extra = Object.keys(YEARBOOK).filter(k => !CHAPTERS.some(c => c.key === k)).sort();
-        return CHAPTERS.concat(extra.map(k => ({ key: k, nav: k, title: /^\d{4}$/.test(k) ? "Năm " + k : k, theme: "", intro: "Những khoảnh khắc đáng nhớ." })));
+        const all = CHAPTERS.concat(extra.map(k => ({ key: k, nav: k, title: /^\d{4}$/.test(k) ? "Năm " + k : k, theme: "", intro: "Những khoảnh khắc đáng nhớ." })));
+        /* kỷ yếu sắp xếp năm mới nhất lên trước (2026, 2025, ... 2021); chương không phải năm xếp cuối */
+        const yr = c => /^\d{4}$/.test(c.key) ? +c.key : -1;
+        return all.sort((a, b) => yr(b) - yr(a));
       }
 
       /* --- dựng (hoặc dựng lại) toàn bộ các chương --- */
@@ -3992,6 +4051,43 @@
     /* ---- Form gửi lời tri ân ---- */
     const form = $("#rsvpForm");
     form.message.addEventListener("input", () => { $("#f-count").textContent = form.message.value.length; });
+    /* ảnh chụp chung (tối đa 15): thu nhỏ trong trình duyệt (cạnh dài 1200 px, JPEG) trước khi gửi */
+    const MAXP = 15, photos = []; let photoBusy = 0;
+    const photoGrid = $("#photoGrid"), photoDrop = $("#photoDrop"), photoErr = $("#e-photo");
+    function photoRender() {
+      photoGrid.textContent = "";
+      photos.forEach((p, i) => {
+        const d = document.createElement("div"); d.className = "pth"; const im = new Image(); im.src = p.data; im.alt = "Ảnh " + (i + 1);
+        const b = document.createElement("button"); b.type = "button"; b.textContent = "×"; b.setAttribute("aria-label", "Bỏ ảnh " + (i + 1)); b.onclick = () => { photos.splice(i, 1); photoRender(); };
+        d.append(im, b); photoGrid.appendChild(d);
+      });
+      for (let k = 0; k < photoBusy; k++) { const d = document.createElement("div"); d.className = "pth load"; d.textContent = "Đang xử lý..."; photoGrid.appendChild(d); }
+      photoDrop.classList.toggle("full", photos.length + photoBusy >= MAXP);
+    }
+    async function photoPrep(f) {
+      const u = URL.createObjectURL(f), im = await new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = no; i.src = u; });
+      URL.revokeObjectURL(u);
+      const k = Math.min(1, 1200 / Math.max(im.naturalWidth, im.naturalHeight)), w = Math.round(im.naturalWidth * k), h = Math.round(im.naturalHeight * k);
+      const c = document.createElement("canvas"); c.width = w; c.height = h; const g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, w, h); g.drawImage(im, 0, 0, w, h);
+      let q = .84, d = c.toDataURL("image/jpeg", q); while (d.length > 650000 && q > .4) { q -= .08; d = c.toDataURL("image/jpeg", q); }
+      return { data: d, name: f.name.replace(/\.[^.]+$/, "").slice(0, 80) };
+    }
+    async function photoAdd(files) {
+      photoErr.classList.remove("show"); const list = [...files].filter(f => /^image\//.test(f.type));
+      if (!list.length && files.length) { photoErr.textContent = "Vui lòng chọn file ảnh (JPG, PNG...)."; photoErr.classList.add("show"); return; }
+      const room = MAXP - photos.length - photoBusy;
+      if (list.length > room) { photoErr.textContent = "Chỉ gửi được tối đa " + MAXP + " ảnh."; photoErr.classList.add("show"); }
+      for (const f of list.slice(0, Math.max(0, room))) {
+        photoBusy++; photoRender();
+        try { photos.push(await photoPrep(f)); } catch (x) { photoErr.textContent = "Không đọc được ảnh " + f.name + ", vui lòng chọn ảnh khác."; photoErr.classList.add("show"); }
+        photoBusy--; photoRender();
+      }
+    }
+    $("#f-photo").addEventListener("change", e => { photoAdd(e.target.files); e.target.value = ""; });
+    photoDrop.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("#f-photo").click(); } });
+    ["dragenter", "dragover"].forEach(t => photoDrop.addEventListener(t, e => { e.preventDefault(); photoDrop.classList.add("over"); }));
+    ["dragleave", "drop"].forEach(t => photoDrop.addEventListener(t, e => { e.preventDefault(); photoDrop.classList.remove("over"); }));
+    photoDrop.addEventListener("drop", e => photoAdd(e.dataTransfer.files));
     form.addEventListener("submit", async ev => {
       ev.preventDefault();
       let ok = true;
@@ -3999,6 +4095,7 @@
       flag("e-name", !form.name.value.trim(), form.name);
       flag("e-msg", form.message.value.trim().length < 5, form.message);
       if (!ok) { form.querySelector(".bad").focus(); return; }
+      if (photoBusy) { toast("Ảnh đang được xử lý, vui lòng đợi giây lát"); return; }
 
       const data = new URLSearchParams();      // dạng form tiêu chuẩn: Apps Script đọc ổn định
       const m = CONFIG.fieldMap;
@@ -4008,6 +4105,7 @@
       data.append(m.consent, form.consent.checked ? "Đồng ý" : "Không");
 
       $("#sendBtn").disabled = true;
+      photos.forEach((p, i) => { data.append("photo" + i, p.data); data.append("photoName" + i, p.name); });
       try {
         if (CONFIG.formEndpoint) await fetch(CONFIG.formEndpoint, { method: "POST", mode: "no-cors", body: data });
         form.style.display = "none"; $("#thanks").style.display = "block"; $("#thanks").focus();
