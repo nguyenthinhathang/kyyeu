@@ -4,9 +4,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Tri ân Cô Nguyễn Thị Nhật Hằng</title>
+  <title>Kỷ yếu số = Cô Nguyễn Thị Nhật Hằng</title>
   <meta name="description"
-    content="Tri ân Cô Nguyễn Thị Nhật Hằng– nguyên Phó Giám đốc Sở Giáo dục và Đào tạo Thành phố Hồ Chí Minh.">
+    content="Kỷ yếu số Cô Nguyễn Thị Nhật Hằng– nguyên Phó Giám đốc Sở Giáo dục và Đào tạo Thành phố Hồ Chí Minh.">
   <meta name="theme-color" content="#07122B">
 
   <!-- ===== OPEN GRAPH (Zalo / Facebook): sửa title, description, image, url ===== -->
@@ -581,7 +581,8 @@
       display: block;
       font-family: var(--font-serif);
       font-style: italic;
-      font-size: clamp(15px, 6.2cqw, 46px);   /* mỗi câu đúng 1 dòng, tự co theo bề rộng cột */
+      font-size: clamp(15px, 6.2cqw, 46px);
+      /* mỗi câu đúng 1 dòng, tự co theo bề rộng cột */
       font-weight: 600;
       letter-spacing: .01em;
       line-height: 1.35;
@@ -1676,8 +1677,13 @@
     }
 
     /* căn giữa các năm khi đủ chỗ; nếu quá dài vẫn vuốt ngang được */
-    .chnav .rail>:first-child { margin-left: auto }
-    .chnav .rail>:last-child { margin-right: auto }
+    .chnav .rail>:first-child {
+      margin-left: auto
+    }
+
+    .chnav .rail>:last-child {
+      margin-right: auto
+    }
 
     .chnav .rail::-webkit-scrollbar {
       display: none
@@ -3182,30 +3188,157 @@
     .pad-tools {
       margin-top: 14px
     }
+
     /* ---- Ô tải ảnh chụp chung (nhiều ảnh) ---- */
-    .field .opt { font-weight: 400; font-size: .85em; color: var(--muted, #AEBAD6); }
-    .pdrop { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 124px; padding: 18px 14px; margin-top: 6px; text-align: center; cursor: pointer; border-radius: 18px; border: 1.5px dashed rgba(235, 210, 138, .6); background: linear-gradient(160deg, rgba(255, 255, 255, .07), rgba(27, 63, 160, .12)); transition: background .25s, border-color .25s, transform .25s; }
-    .pdrop svg { width: 38px; height: 38px; fill: none; stroke: #EBD28A; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; margin-bottom: 2px; }
-    .pdrop b { font-weight: 600; font-size: 15.5px; color: var(--text, #E9EEF8); }
-    .pdrop span { font-size: 12.5px; color: var(--muted, #AEBAD6); }
-    .pdrop:hover, .pdrop.over, .pdrop:focus-visible { border-color: #D4AF37; background: linear-gradient(160deg, rgba(255, 255, 255, .12), rgba(27, 63, 160, .22)); outline: none; }
-    .pdrop.over { transform: scale(1.01); }
-    .pdrop.full { display: none; }
-    .pgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 10px; margin-top: 10px; }
-    .pgrid:empty { display: none; }
-    .pth { position: relative; aspect-ratio: 1; border-radius: 14px; overflow: hidden; border: 1px solid rgba(235, 210, 138, .5); box-shadow: 0 8px 18px rgba(0, 0, 0, .3); animation: pthIn .35s ease both; }
-    .pth img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .pth.load { display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, .06); font-size: 12px; color: var(--muted, #AEBAD6); }
-    .pth button { position: absolute; right: 5px; top: 5px; width: 26px; height: 26px; border-radius: 50%; border: 0; cursor: pointer; font: 600 16px/1 system-ui; color: #fff; background: rgba(7, 18, 43, .78); }
-    .pth button:hover { background: #b33; }
-    @keyframes pthIn { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: none; } }
+    .field .opt {
+      font-weight: 400;
+      font-size: .85em;
+      color: var(--muted, #AEBAD6);
+    }
+
+    .pdrop {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      min-height: 124px;
+      padding: 18px 14px;
+      margin-top: 6px;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 18px;
+      border: 1.5px dashed rgba(235, 210, 138, .6);
+      background: linear-gradient(160deg, rgba(255, 255, 255, .07), rgba(27, 63, 160, .12));
+      transition: background .25s, border-color .25s, transform .25s;
+    }
+
+    .pdrop svg {
+      width: 38px;
+      height: 38px;
+      fill: none;
+      stroke: #EBD28A;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      margin-bottom: 2px;
+    }
+
+    .pdrop b {
+      font-weight: 600;
+      font-size: 15.5px;
+      color: var(--text, #E9EEF8);
+    }
+
+    .pdrop span {
+      font-size: 12.5px;
+      color: var(--muted, #AEBAD6);
+    }
+
+    .pdrop:hover,
+    .pdrop.over,
+    .pdrop:focus-visible {
+      border-color: #D4AF37;
+      background: linear-gradient(160deg, rgba(255, 255, 255, .12), rgba(27, 63, 160, .22));
+      outline: none;
+    }
+
+    .pdrop.over {
+      transform: scale(1.01);
+    }
+
+    .pdrop.full {
+      display: none;
+    }
+
+    .pgrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .pgrid:empty {
+      display: none;
+    }
+
+    .pth {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(235, 210, 138, .5);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, .3);
+      animation: pthIn .35s ease both;
+    }
+
+    .pth img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .pth.load {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, .06);
+      font-size: 12px;
+      color: var(--muted, #AEBAD6);
+    }
+
+    .pth button {
+      position: absolute;
+      right: 5px;
+      top: 5px;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 0;
+      cursor: pointer;
+      font: 600 16px/1 system-ui;
+      color: #fff;
+      background: rgba(7, 18, 43, .78);
+    }
+
+    .pth button:hover {
+      background: #b33;
+    }
+
+    @keyframes pthIn {
+      from {
+        opacity: 0;
+        transform: scale(.85);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
     /* ---- Trang riêng (chuky.html, loitri-an.html hoặc ?trang=chuky / ?trang=loitri): chỉ hiện một phần ---- */
-    html[data-solo] #cover, html[data-solo] .nav, html[data-solo] .skip { display: none !important; }
-    html[data-solo="chuky"] main > section:not(#chuky),
-    html[data-solo="loitri"] main > section:not(#rsvp) { display: none !important; }
-    html[data-solo] main { padding-top: 64px; }
-    #soloBack { position: fixed; z-index: 60; left: 14px; top: 14px; display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: 999px; font: 500 13.5px/1 var(--sans, system-ui); color: #EBD28A; text-decoration: none; background: rgba(7, 18, 43, .72); border: 1px solid rgba(235, 210, 138, .5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
-    #soloBack:hover { background: rgba(27, 63, 160, .6); }
+    html[data-solo] #cover,
+    html[data-solo] .nav,
+    html[data-solo] .skip {
+      display: none !important;
+    }
+
+    html[data-solo="chuky"] main>section:not(#chuky),
+    html[data-solo="loitri"] main>section:not(#rsvp) {
+      display: none !important;
+    }
+
+    html[data-solo] main {
+      padding-top: 24px;
+    }
+
+    html:not([data-solo]) #chuky {
+      display: none !important;
+    }
+
+    /* trang chủ: ẩn bức tranh chữ ký (vẫn xem ở chuky.html) */
   </style>
 </head>
 
@@ -3218,12 +3351,11 @@
       if (!s) return;
       document.body.classList.remove("locked");
       document.title = s === "chuky" ? "Bức tranh chữ ký tri ân" : "Gửi lời yêu thương";
-      var a = document.createElement("a"); a.id = "soloBack"; a.href = "./"; a.textContent = "← Trang chủ"; document.body.appendChild(a);
     })();
   </script>
   <a class="skip" href="#hero">Bỏ qua, tới nội dung chính</a>
   <nav class="nav glass" aria-label="Điều hướng nhanh">
-    <a href="#hero">Thư mời</a><a href="#kyyeu">Kỷ yếu</a><a href="#loingo">Lời ngỏ</a><a href="#rsvp">Tri ân</a>
+    <a href="#kyyeu">Kỷ yếu</a><a href="#loingo">Lời ngỏ</a><a href="#rsvp">Tri ân</a>
   </nav>
 
   <!-- ===== BỘ HỌA TIẾT SVG DÙNG CHUNG (trống đồng – sen – góc hồi văn) ===== -->
@@ -3343,7 +3475,7 @@
   <div id="cover" role="dialog" aria-modal="true" aria-label="Thiệp mời">
     <div class="cv-grid">
       <div class="cv-text">
-        <h1 aria-label="Trí sáng tâm trong ngời chất ngọc; Bền lòng chặt dạ dựng tương lai"><span class="b gold-text">Trí sáng tâm trong ngời chất ngọc;<br>Bền lòng chặt dạ dựng tương lai</span></h1>
+        <h1 aria-label="Kỷ yếu số – Dành tặng"><span class="b gold-text">KỶ YẾU SỐ<br>Dành tặng</span></h1>
         <div class="rule" aria-hidden="true"><i></i></div>
         <p class="cv-n">Cô Nguyễn Thị Nhật Hằng</p>
         <p class="cv-r">Nguyên Phó Giám đốc Sở Giáo dục và Đào tạo Thành phố Hồ Chí Minh</p>
@@ -3375,10 +3507,10 @@
       <div class="wrap hero-wrap reveal">
         <div class="hero-grid">
           <div class="hero-text">
-            <h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap">Tri Ân Cô Nguyễn Thị Nhật Hằng</h1>
+            <h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap">Tri
+              Ân Cô Nguyễn Thị Nhật Hằng</h1>
             <p class="event">Trí sáng tâm trong ngời chất ngọc;<br>Bền lòng chặt dạ dựng tương lai</p>
             <div class="rule" aria-hidden="true"><i></i></div>
-            <p class="to-lbl">Dành tặng</p>
             <p class="who gold-text">Cô Nguyễn Thị Nhật Hằng</p>
             <p class="role">Nguyên Phó Giám đốc Sở Giáo dục và Đào tạo Thành phố Hồ Chí Minh</p>
             <p class="hero-cta"><a class="btn btn-gold" href="#rsvp">Gửi lời tri ân</a><a class="btn btn-line"
@@ -3571,13 +3703,18 @@
             <p class="err" id="e-msg">Vui lòng nhập lời nhắn gửi (tối thiểu 5 ký tự).</p>
           </div>
           <div class="field">
-            <label for="f-photo">Gửi hình chụp chung cùng Cô <span class="opt">(không bắt buộc · tối đa 15 ảnh)</span></label>
+            <label for="f-photo">Hãy tải hình ảnh kỷ niệm về quá trình lao động, gắn bó đồng nghiệp cùng cô Nhật Hằng</label>
             <label class="pdrop" id="photoDrop" for="f-photo" tabindex="0">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h1.2l1.1-1.6A1.5 1.5 0 0 1 10 3.8h4a1.5 1.5 0 0 1 1.2.6L16.3 6h1.2A2.5 2.5 0 0 1 20 8.5v8A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5z"/><circle cx="12" cy="12.5" r="3.4"/></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M4 8.5A2.5 2.5 0 0 1 6.5 6h1.2l1.1-1.6A1.5 1.5 0 0 1 10 3.8h4a1.5 1.5 0 0 1 1.2.6L16.3 6h1.2A2.5 2.5 0 0 1 20 8.5v8A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5z" />
+                <circle cx="12" cy="12.5" r="3.4" />
+              </svg>
               <b>Chọn ảnh hoặc kéo thả vào đây</b>
               <span>Có thể chọn nhiều ảnh cùng lúc · JPG, PNG</span>
             </label>
-            <input type="file" id="f-photo" accept="image/*" multiple style="position:absolute;width:1px;height:1px;opacity:0;padding:0;border:0">
+            <input type="file" id="f-photo" accept="image/*" multiple
+              style="position:absolute;width:1px;height:1px;opacity:0;padding:0;border:0">
             <div class="pgrid" id="photoGrid" aria-live="polite"></div>
             <p class="err" id="e-photo">Không đọc được ảnh này, vui lòng chọn ảnh khác.</p>
           </div>
@@ -3729,7 +3866,7 @@
 
   </footer>
 
-  <!-- Nhạc nền: mặc định TẮT. Điền CONFIG.musicSrc để dùng. -->
+  <!-- Nhạc nền: tự phát khi bấm "Mở thiệp" (CONFIG.musicSrc). -->
   <audio id="bgm" loop preload="none"></audio>
   <button id="music" class="glass" type="button" aria-pressed="false" aria-label="Bật nhạc nền">
     <svg class="on" viewBox="0 0 24 24" aria-hidden="true">
@@ -3758,7 +3895,7 @@
       address: "",   // địa chỉ đầy đủ — dùng cho bản đồ, nút Google Maps, .ics
       phone: "",   // vd "0900000000"
       email: "",
-      musicSrc: "",   // đường dẫn file nhạc (mp3) nếu muốn bật nhạc nền
+      musicSrc: "nhacnen.m4a",   // file nhạc nền (tự phát khi bấm "Mở thiệp"); để "" nếu muốn tắt
       /* RSVP + LỜI TRI ÂN (một form): dán URL Google Apps Script Web App (ghi vào Google Sheet) hoặc URL formResponse của Google Form.
          Dữ liệu gửi dạng POST (FormData) với các khoá: name, org, message, consent.
          Nếu dùng Google Form, đổi tên các khoá bên dưới thành mã entry.xxxxx tương ứng. */
@@ -3822,6 +3959,7 @@
     $("#openBtn").addEventListener("click", () => {
       $("#cover").classList.add("open");
       document.body.classList.remove("locked");
+      if (window.playMusic) playMusic(true);
       setTimeout(() => { $("#cover").style.display = "none"; window.scrollTo(0, 0); }, 1100);
     });
 
@@ -4443,15 +4581,17 @@
       catch (e) { prompt("Sao chép liên kết:", location.href); }
     });
 
-    /* ---- Nhạc nền (mặc định TẮT) ---- */
-    $("#music").addEventListener("click", function () {
+    /* ---- Nhạc nền: tự phát khi bấm "Mở thiệp"; nút góc dưới để bật/tắt ---- */
+    const setMusicBtn = on => { const b = $("#music"); b.setAttribute("aria-pressed", String(on)); b.setAttribute("aria-label", on ? "Tắt nhạc nền" : "Bật nhạc nền"); };
+    window.playMusic = function (quiet) {
       const au = $("#bgm");
-      if (!CONFIG.musicSrc) return toast("Chưa gắn file nhạc");
+      if (!CONFIG.musicSrc) { if (!quiet) toast("Chưa gắn file nhạc"); return; }
       if (!au.src) au.src = CONFIG.musicSrc;
-      const on = this.getAttribute("aria-pressed") === "true";
-      if (on) { au.pause(); } else { au.play().catch(() => toast("Không phát được nhạc")); }
-      this.setAttribute("aria-pressed", String(!on));
-      this.setAttribute("aria-label", on ? "Bật nhạc nền" : "Tắt nhạc nền");
+      au.volume = 0.6;
+      au.play().then(() => setMusicBtn(true)).catch(() => { setMusicBtn(false); if (!quiet) toast("Không phát được nhạc"); });
+    };
+    $("#music").addEventListener("click", function () {
+      if (this.getAttribute("aria-pressed") === "true") { $("#bgm").pause(); setMusicBtn(false); } else playMusic();
     });
   </script>
 </body>
