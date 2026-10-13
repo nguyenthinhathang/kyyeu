@@ -3326,6 +3326,94 @@
       cursor: pointer;
     }
 
+    /* ---- Hiệu ứng đang gửi lời tri ân ---- */
+    .sending {
+      position: absolute;
+      inset: 0;
+      z-index: 6;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 24px;
+      text-align: center;
+      border-radius: inherit;
+      background: rgba(7, 18, 43, .82);
+      -webkit-backdrop-filter: blur(6px);
+      backdrop-filter: blur(6px);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .35s, visibility .35s;
+    }
+
+    form.busy .sending {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .sending svg {
+      width: 92px;
+      height: 92px;
+      color: var(--gold);
+      filter: drop-shadow(0 0 18px rgba(212, 175, 55, .45));
+      animation: spin 2.6s linear infinite;
+    }
+
+    .sending b {
+      font: italic 600 26px var(--font-serif);
+    }
+
+    .sending span {
+      font-size: 14px;
+      color: var(--muted);
+      max-width: 320px;
+    }
+
+    .sending .bar {
+      display: block;
+      width: min(260px, 70%);
+      height: 3px;
+      border-radius: 3px;
+      overflow: hidden;
+      background: rgba(235, 210, 138, .2);
+      position: relative;
+    }
+
+    .sending .bar::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      width: 40%;
+      border-radius: inherit;
+      background: var(--gold-grad);
+      animation: sendBar 1.4s ease-in-out infinite;
+    }
+
+    @keyframes sendBar {
+      from { transform: translateX(-100%) }
+      to { transform: translateX(250%) }
+    }
+
+    #sendBtn .spin {
+      display: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid rgba(10, 24, 48, .25);
+      border-top-color: var(--ink);
+      animation: spin .8s linear infinite;
+    }
+
+    form.busy #sendBtn .spin {
+      display: inline-block;
+    }
+
+    form.busy #sendBtn {
+      cursor: progress;
+      opacity: .85;
+    }
+
     .pth button:hover {
       background: #b33;
     }
@@ -3744,7 +3832,13 @@
               <span>Xác nhận gửi lời yêu thương.</span>
             </label>
           </div>
-          <p class="center"><button class="btn btn-gold" type="submit" id="sendBtn">Gửi lời yêu thương</button></p>
+          <p class="center"><button class="btn btn-gold" type="submit" id="sendBtn"><i class="spin" aria-hidden="true"></i><span id="sendTxt">Gửi lời yêu thương</span></button></p>
+          <div class="sending" id="sending" role="status" aria-live="polite">
+            <svg aria-hidden="true"><use href="#sunflower" /></svg>
+            <b class="gold-text">Đang gửi lời yêu thương...</b>
+            <span id="sendingSub">Xin quý vị vui lòng chờ trong giây lát.</span>
+            <i class="bar" aria-hidden="true"></i>
+          </div>
           <p class="dev-note">Trường hợp lỗi mạng, vui lòng liên hệ trực tiếp theo thông tin ở cuối trang.</p>
         </form>
 
@@ -4266,13 +4360,23 @@
       data.append(m.message, form.message.value.trim());
       data.append(m.consent, form.consent.checked ? "Đồng ý" : "Không");
 
-      $("#sendBtn").disabled = true;
       photos.forEach((p, i) => { data.append("photo" + i, p.data); data.append("photoName" + i, p.name); data.append("photoYear" + i, p.year || ""); });
+      /* hiệu ứng đang gửi: phủ mờ form + hoa xoay + thanh chạy; nút đổi thành "Đang gửi..." */
+      const busy = on => {
+        form.classList.toggle("busy", on); $("#sendBtn").disabled = on; form.setAttribute("aria-busy", String(on));
+        $("#sendTxt").textContent = on ? "Đang gửi..." : "Gửi lời yêu thương";
+      };
+      $("#sendingSub").textContent = photos.length ? "Đang tải lên " + photos.length + " ảnh kỷ niệm, có thể mất một lúc. Xin quý vị vui lòng không đóng trang." : "Xin quý vị vui lòng chờ trong giây lát.";
+      busy(true);
+      const t0 = Date.now();
       try {
         if (CONFIG.formEndpoint) await fetch(CONFIG.formEndpoint, { method: "POST", mode: "no-cors", body: data });
+        await new Promise(r => setTimeout(r, Math.max(0, 900 - (Date.now() - t0))));   // giữ hiệu ứng tối thiểu ~1 giây cho mượt
+        busy(false);
         form.style.display = "none"; $("#thanks").style.display = "block"; $("#thanks").focus();
+        $("#thanks").scrollIntoView({ behavior: "smooth", block: "center" });
       } catch (e) {
-        $("#sendBtn").disabled = false; toast("Gửi chưa được, vui lòng thử lại");
+        busy(false); toast("Gửi chưa được, vui lòng thử lại");
       }
     });
 
