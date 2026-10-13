@@ -3311,6 +3311,21 @@
       background: rgba(7, 18, 43, .78);
     }
 
+    .pth select {
+      position: absolute;
+      left: 5px;
+      right: 5px;
+      bottom: 5px;
+      height: 28px;
+      padding: 0 6px;
+      border-radius: 8px;
+      border: 1px solid rgba(235, 210, 138, .6);
+      background: rgba(7, 18, 43, .85);
+      color: #EBD28A;
+      font: 500 12.5px var(--font-sans);
+      cursor: pointer;
+    }
+
     .pth button:hover {
       background: #b33;
     }
@@ -3715,7 +3730,7 @@
                 <circle cx="12" cy="12.5" r="3.4" />
               </svg>
               <b>Chọn ảnh hoặc kéo thả vào đây</b>
-              <span>Có thể chọn nhiều ảnh cùng lúc · JPG, PNG</span>
+              <span>Có thể chọn nhiều ảnh cùng lúc · JPG, PNG · chọn năm cho từng ảnh sau khi tải lên</span>
             </label>
             <input type="file" id="f-photo" accept="image/*" multiple
               style="position:absolute;width:1px;height:1px;opacity:0;padding:0;border:0">
@@ -4194,14 +4209,19 @@
     const form = $("#rsvpForm");
     form.message.addEventListener("input", () => { $("#f-count").textContent = form.message.value.length; });
     /* ảnh chụp chung (tối đa 15): thu nhỏ trong trình duyệt (cạnh dài 1200 px, JPEG) trước khi gửi */
-    const MAXP = 15, photos = []; let photoBusy = 0;
+    const MAXP = 15, photos = []; let photoBusy = 0, lastYear = "";
+    /* năm cho từng ảnh (khớp các chương kỷ yếu); ảnh mới tải lên lấy sẵn năm vừa chọn gần nhất */
+    const PHOTO_YEARS = CHAPTERS.map(c => c.key).filter(k => /^\d{4}$/.test(k)).sort((a, b) => b - a);
     const photoGrid = $("#photoGrid"), photoDrop = $("#photoDrop"), photoErr = $("#e-photo");
     function photoRender() {
       photoGrid.textContent = "";
       photos.forEach((p, i) => {
         const d = document.createElement("div"); d.className = "pth"; const im = new Image(); im.src = p.data; im.alt = "Ảnh " + (i + 1);
         const b = document.createElement("button"); b.type = "button"; b.textContent = "×"; b.setAttribute("aria-label", "Bỏ ảnh " + (i + 1)); b.onclick = () => { photos.splice(i, 1); photoRender(); };
-        d.append(im, b); photoGrid.appendChild(d);
+        const s = document.createElement("select"); s.setAttribute("aria-label", "Năm của ảnh " + (i + 1));
+        s.innerHTML = '<option value="">Năm?</option>' + PHOTO_YEARS.map(y => '<option value="' + y + '">' + y + '</option>').join("");
+        s.value = p.year || ""; s.onchange = () => { p.year = s.value; if (s.value) lastYear = s.value; };
+        d.append(im, s, b); photoGrid.appendChild(d);
       });
       for (let k = 0; k < photoBusy; k++) { const d = document.createElement("div"); d.className = "pth load"; d.textContent = "Đang xử lý..."; photoGrid.appendChild(d); }
       photoDrop.classList.toggle("full", photos.length + photoBusy >= MAXP);
@@ -4221,7 +4241,7 @@
       if (list.length > room) { photoErr.textContent = "Chỉ gửi được tối đa " + MAXP + " ảnh."; photoErr.classList.add("show"); }
       for (const f of list.slice(0, Math.max(0, room))) {
         photoBusy++; photoRender();
-        try { photos.push(await photoPrep(f)); } catch (x) { photoErr.textContent = "Không đọc được ảnh " + f.name + ", vui lòng chọn ảnh khác."; photoErr.classList.add("show"); }
+        try { const p = await photoPrep(f); p.year = lastYear; photos.push(p); } catch (x) { photoErr.textContent = "Không đọc được ảnh " + f.name + ", vui lòng chọn ảnh khác."; photoErr.classList.add("show"); }
         photoBusy--; photoRender();
       }
     }
@@ -4247,7 +4267,7 @@
       data.append(m.consent, form.consent.checked ? "Đồng ý" : "Không");
 
       $("#sendBtn").disabled = true;
-      photos.forEach((p, i) => { data.append("photo" + i, p.data); data.append("photoName" + i, p.name); });
+      photos.forEach((p, i) => { data.append("photo" + i, p.data); data.append("photoName" + i, p.name); data.append("photoYear" + i, p.year || ""); });
       try {
         if (CONFIG.formEndpoint) await fetch(CONFIG.formEndpoint, { method: "POST", mode: "no-cors", body: data });
         form.style.display = "none"; $("#thanks").style.display = "block"; $("#thanks").focus();
