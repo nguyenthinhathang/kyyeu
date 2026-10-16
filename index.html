@@ -358,6 +358,7 @@
       z-index: 2;
       height: 100%;
       display: grid;
+      grid-template-rows: 46vh 1fr;
       grid-template-rows: 46svh 1fr;
       transition: opacity .45s, transform .7s
     }
@@ -411,6 +412,7 @@
 
     #cover .cv-photo {
       position: relative;
+      height: 36vh;
       height: 36svh;
       aspect-ratio: 4/5;
       border-radius: 150px 20px 150px 20px;
@@ -499,13 +501,14 @@
       align-items: center;
       text-align: center;
       padding: 30px 24px max(28px, env(safe-area-inset-bottom));
-      min-height: 0
+      min-height: 0;
+      overflow-y: auto
     }
 
+    /* chữ + nút luôn HIỆN sẵn; hiệu ứng chỉ làm mờ-hiện dần khi máy cho phép chạy (fill "both").
+       Trước đây đặt opacity:0 rồi chờ hiệu ứng -> máy tắt hiệu ứng động / trình duyệt Zalo không thấy chữ và nút "Mở thiệp". */
     #cover .cv-text>* {
-      opacity: 0;
-      transform: translateY(16px);
-      animation: cvUp .9s ease-out forwards
+      animation: cvUp .9s ease-out both
     }
 
     #cover .cv-text>:nth-child(1) {
@@ -541,6 +544,11 @@
     }
 
     @keyframes cvUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px)
+      }
+
       to {
         opacity: 1;
         transform: none
@@ -590,6 +598,7 @@
       display: block;
       font-family: var(--font-serif);
       font-style: italic;
+      font-size: clamp(15px, 5.6vw, 46px);
       font-size: clamp(15px, 6.2cqw, 46px);
       /* mỗi câu đúng 1 dòng, tự co theo bề rộng cột */
       font-weight: 600;
@@ -3430,6 +3439,205 @@
       }
     }
 
+    /* ---- Xem lời chúc (có mật khẩu) ---- */
+    #wv {
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: max(12px, env(safe-area-inset-top)) 10px max(12px, env(safe-area-inset-bottom));
+      background: radial-gradient(70vmax 60vmax at 80% 0%, rgba(27, 63, 160, .35), transparent 60%), rgba(3, 8, 22, .86);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      animation: wvFade .3s ease both;
+    }
+
+    #wv[hidden] { display: none; }
+    body.wvopen { overflow: hidden; }
+
+    .wv-box {
+      position: relative;
+      width: min(980px, 100%);
+      max-height: 100%;
+      display: flex;
+      flex-direction: column;
+      border-radius: 26px;
+      border: 1px solid var(--glass-line);
+      background: linear-gradient(170deg, #0D1F45 0%, #081530 45%, #060F24 100%);
+      box-shadow: 0 40px 90px rgba(0, 0, 0, .65), inset 0 1px 0 rgba(255, 255, 255, .08);
+      overflow: hidden;
+      animation: wvPop .45s cubic-bezier(.2, .8, .2, 1) both;
+    }
+
+    .wv-box.locked { width: min(460px, 100%); }
+
+    .wv-box::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 3px;
+      background: var(--gold-grad);
+      z-index: 3;
+    }
+
+    .wv-x {
+      position: absolute;
+      right: 14px;
+      top: 14px;
+      z-index: 4;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 1px solid var(--glass-line);
+      background: rgba(255, 255, 255, .06);
+      color: var(--gold-soft);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .2s, transform .2s;
+    }
+
+    .wv-x:hover { background: rgba(255, 255, 255, .14); transform: rotate(90deg); }
+    .wv-x svg, .wv-nav svg, .wv-search svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+
+    /* màn nhập mật khẩu */
+    .wv-lock { padding: 40px 28px 32px; text-align: center; }
+    .wv-lock[hidden], .wv-list[hidden] { display: none; }
+    .wv-seal { position: relative; width: 96px; height: 96px; margin: 0 auto 14px; color: var(--gold); }
+    .wv-seal > svg:first-child { width: 100%; height: 100%; animation: spin 40s linear infinite; }
+    .wv-seal .k { position: absolute; left: 50%; top: 50%; width: 30px; height: 30px; margin: -15px 0 0 -15px; stroke: var(--gold-soft); fill: rgba(7, 18, 43, .85); stroke-width: 1.6; }
+    .wv-lock h3 { font-size: clamp(28px, 7vw, 36px); font-style: italic; margin-top: 6px; }
+    .wv-sub { color: var(--muted); font-size: 15px; line-height: 1.6; margin: 8px auto 20px; max-width: 340px; }
+    .wv-lock input {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(235, 210, 138, .4);
+      background: rgba(255, 255, 255, .07);
+      color: var(--text);
+      font: inherit;
+      font-size: 17px;
+      text-align: center;
+      letter-spacing: .12em;
+    }
+    .wv-lock .btn { width: 100%; }
+    .wv-err { min-height: 22px; margin: 8px 0 10px; color: #FFA59B; font-size: 14px; line-height: 1.45; }
+    .wv-err.info { color: var(--muted); }
+
+    /* danh sách lời chúc */
+    .wv-list { display: flex; flex-direction: column; min-height: 0; height: min(88vh, 900px); }
+    .wv-head { padding: 26px 70px 18px 28px; border-bottom: 1px solid var(--glass-line); background: linear-gradient(180deg, rgba(255, 255, 255, .04), transparent); }
+    .wv-head .eyebrow { text-align: left; }
+    .wv-head h3 { font-size: clamp(24px, 4.4vw, 38px); font-style: italic; margin: 4px 0 12px; line-height: 1.2; }
+    .wv-stats { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .wv-stats span { display: inline-flex; align-items: baseline; gap: 6px; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--glass-line); background: rgba(255, 255, 255, .05); font-size: 12.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+    .wv-stats b { font: 600 20px/1 var(--font-serif); color: var(--gold-soft); letter-spacing: 0; }
+    .wv-tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .wv-search { flex: 1 1 260px; position: relative; margin: 0; color: var(--gold-soft); }
+    .wv-search svg { position: absolute; left: 14px; top: 50%; margin-top: -10px; }
+    .wv-search input, .wv-tools select {
+      width: 100%;
+      min-height: 46px;
+      padding: 10px 14px 10px 44px;
+      border-radius: 999px;
+      border: 1px solid rgba(235, 210, 138, .35);
+      background: rgba(255, 255, 255, .06);
+      color: var(--text);
+      font: inherit;
+      font-size: 15px;
+    }
+    .wv-tools select { width: auto; padding: 10px 16px; cursor: pointer; }
+    .wv-tools select option { background: #0B1A3A; }
+    .wv-search input:focus, .wv-tools select:focus, .wv-lock input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212, 175, 55, .22); }
+    .wv-chips { display: flex; gap: 4px; padding: 4px; border-radius: 999px; border: 1px solid var(--glass-line); background: rgba(255, 255, 255, .04); }
+    .wv-chips button { min-height: 38px; padding: 6px 16px; border: 0; border-radius: 999px; background: none; color: var(--text); font: 500 14px var(--font-sans); cursor: pointer; }
+    .wv-chips button.on { background: var(--gold-grad); color: var(--ink); font-weight: 600; }
+
+    /* sổ lưu bút: một cột, đọc từ trên xuống, tên người gửi ở đầu thẻ, chữ đứng dễ đọc */
+    .wv-items { flex: 1; overflow-y: auto; padding: 24px 22px 34px; -webkit-overflow-scrolling: touch; scrollbar-color: rgba(235, 210, 138, .35) transparent; background: radial-gradient(60% 40% at 50% 0%, rgba(27, 63, 160, .18), transparent 70%); }
+    .wv-items > *, .wv-head > * { max-width: 860px; margin-left: auto; margin-right: auto; }
+    .wv-card {
+      position: relative;
+      margin-bottom: 16px;
+      padding: 22px 26px 22px 28px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, .03));
+      border: 1px solid rgba(235, 210, 138, .18);
+      box-shadow: 0 18px 36px -24px rgba(0, 0, 0, .85);
+      animation: wvIn .5s ease both;
+      transition: border-color .25s, background .25s;
+    }
+    .wv-card::before { content: ""; position: absolute; left: 0; top: 18px; bottom: 18px; width: 3px; border-radius: 0 3px 3px 0; background: var(--gold-grad); }
+    .wv-card:hover { border-color: rgba(235, 210, 138, .45); background: linear-gradient(135deg, rgba(255, 255, 255, .09), rgba(255, 255, 255, .04)); }
+    .wv-card header { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+    .wv-card header > div { flex: 1; min-width: 0; }
+    .wv-av { flex: none; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--gold-grad); color: var(--ink); font: 700 18px var(--font-serif); box-shadow: 0 0 0 3px rgba(212, 175, 55, .16), 0 6px 14px rgba(0, 0, 0, .35); }
+    .wv-card .who { font: 600 18px/1.3 var(--font-sans); color: var(--gold-soft); }
+    .wv-card .org { margin-top: 2px; font-size: 14px; line-height: 1.45; color: var(--muted); }
+    .wv-meta { flex: none; text-align: right; font-size: 12.5px; line-height: 1.5; color: var(--muted); font-variant-numeric: tabular-nums; }
+    .wv-meta b { display: block; font: 600 13px var(--font-sans); letter-spacing: .08em; color: var(--gold-soft); }
+    .wv-card .msg { position: relative; white-space: pre-line; font: 400 16.5px/1.85 var(--font-sans); color: #EEF2FA; word-break: break-word; padding-left: 30px; }
+    .wv-card .msg::before { content: "“"; position: absolute; left: -2px; top: -10px; font: 700 46px/1 var(--font-serif); color: var(--gold); opacity: .7; }
+    .wv-card .msg.clamp { display: -webkit-box; -webkit-line-clamp: 10; -webkit-box-orient: vertical; overflow: hidden; }
+    .wv-card .more { margin: 8px 0 0 30px; padding: 0; border: 0; background: none; color: var(--gold-soft); font: 500 14px var(--font-sans); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+    .wv-card .pics { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; margin: 16px 0 0 30px; }
+    .wv-card .pics.n1 { grid-template-columns: minmax(0, 360px); }
+    .wv-card .pics.n2 { grid-template-columns: repeat(2, minmax(0, 220px)); }
+    .wv-card .pics button { position: relative; padding: 0; border: 1px solid var(--glass-line); border-radius: 12px; overflow: hidden; aspect-ratio: 4/3; background: #0b1a38; cursor: zoom-in; }
+    .wv-card .pics img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s; }
+    .wv-card .pics button:hover img { transform: scale(1.05); }
+    .wv-card .pics .plus { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(7, 18, 43, .62); color: #fff; font: 600 22px var(--font-serif); }
+    .wv-empty { text-align: center; color: var(--muted); padding: 50px 10px; }
+    .wv-empty b { display: block; font: italic 600 26px var(--font-serif); color: var(--gold-soft); margin-bottom: 6px; }
+
+    /* xem ảnh lớn bên trong hộp lời chúc */
+    .wv-lb { position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 60px 60px 24px; background: rgba(3, 8, 22, .96); }
+    .wv-lb[hidden] { display: none; }
+    .wv-lb img { max-width: 100%; max-height: calc(100% - 40px); object-fit: contain; border-radius: 12px; box-shadow: 0 30px 60px rgba(0, 0, 0, .6); }
+    .wv-lb p { color: var(--gold-soft); font: italic 500 18px var(--font-serif); text-align: center; }
+    .wv-nav { position: absolute; top: 50%; margin-top: -22px; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--glass-line); background: rgba(255, 255, 255, .08); color: var(--gold-soft); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .wv-nav.p { left: 12px; }
+    .wv-nav.n { right: 12px; }
+    .wv-nav.c { top: 14px; right: 14px; margin: 0; }
+
+    @media (max-width: 640px) {
+      .wv-box { border-radius: 20px; }
+      /* điện thoại: phần đầu (tiêu đề, thống kê, tìm kiếm) cuộn theo danh sách, không cố định chiếm chỗ */
+      .wv-list { height: 92vh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+      .wv-items { flex: none; overflow: visible; }
+      .wv-head { padding: 20px 58px 12px 16px; }
+      .wv-head h3 { font-size: 24px; margin-bottom: 10px; }
+      .wv-stats { gap: 6px; margin-bottom: 12px; }
+      .wv-stats span { padding: 4px 10px; font-size: 11px; }
+      .wv-stats b { font-size: 17px; }
+      .wv-search { flex-basis: 100%; }
+      .wv-chips { flex: none; }
+      .wv-chips button { min-height: 36px; padding: 5px 12px; font-size: 13.5px; }
+      .wv-tools select { flex: 1; min-width: 0; min-height: 46px; }
+      .wv-items { padding: 14px 12px 22px; }
+      .wv-card { padding: 18px 16px 16px 20px; }
+      .wv-card .msg { font-size: 16px; padding-left: 0; }
+      .wv-card .msg::before { display: none; }
+      .wv-card .more, .wv-card .pics { margin-left: 0; }
+      .wv-card .pics { grid-template-columns: repeat(3, 1fr); }
+      .wv-card .pics.n1 { grid-template-columns: 1fr; }
+      .wv-card .pics.n2 { grid-template-columns: 1fr 1fr; }
+      .wv-av { width: 42px; height: 42px; font-size: 16px; }
+      .wv-card .who { font-size: 16.5px; }
+      .wv-lb { padding: 56px 10px 16px; }
+      .wv-nav.p { left: 6px; }
+      .wv-nav.n { right: 6px; }
+    }
+
+    @keyframes wvIn { from { opacity: 0; transform: translateY(14px) } to { opacity: 1; transform: none } }
+    @keyframes wvFade { from { opacity: 0 } to { opacity: 1 } }
+    @keyframes wvPop { from { opacity: 0; transform: translateY(18px) scale(.98) } to { opacity: 1; transform: none } }
+
     /* ---- Trang riêng (chuky.html, loitri-an.html hoặc ?trang=chuky / ?trang=loitri): chỉ hiện một phần ---- */
     html[data-solo] #cover,
     html[data-solo] .nav,
@@ -3973,6 +4181,11 @@
             <circle cx="18" cy="18" r="2.5" />
             <path d="M8.2 11l7.6-4M8.2 13l7.6 4" />
           </svg>Chia sẻ thiệp</button>
+        <button class="btn btn-line" type="button" id="wishBtn">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="5" y="10" width="14" height="10" rx="2" />
+            <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+          </svg>Xem lời chúc</button>
       </div>
       <p class="thank gold-text">Trân trọng./.</p>
     </div>
@@ -3995,6 +4208,47 @@
     </svg>
   </button>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- ===== XEM LỜI CHÚC (có mật khẩu) — mật khẩu đặt trong Apps Script: Thuộc tính tập lệnh VIEW_KEY ===== -->
+  <div id="wv" role="dialog" aria-modal="true" aria-labelledby="wvTitle" hidden>
+    <div class="wv-box">
+      <button class="wv-x" type="button" id="wvClose" aria-label="Đóng">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg></button>
+      <form class="wv-lock" id="wvLock">
+        <div class="wv-seal" aria-hidden="true"><svg><use href="#sunflower" /></svg>
+          <svg class="k" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg></div>
+        <p class="eyebrow">Lưu bút tri ân</p>
+        <h3 class="gold-text" id="wvTitle">Những lời chúc gửi Cô</h3>
+        <p class="wv-sub">Vui lòng nhập mật khẩu để mở xem những lời chúc, lời tri ân của quý Thầy/Cô, quý đồng nghiệp.</p>
+        <input type="password" id="wvPw" autocomplete="off" placeholder="Nhập mật khẩu" aria-label="Mật khẩu xem lời chúc">
+        <p class="wv-err" id="wvErr" aria-live="polite"></p>
+        <button class="btn btn-gold" type="submit" id="wvGo">Mở xem lời chúc</button>
+      </form>
+      <div class="wv-list" id="wvView" hidden>
+        <header class="wv-head">
+          <p class="eyebrow">Lưu bút tri ân</p>
+          <h3 class="gold-text">Những lời chúc gửi Cô Nguyễn Thị Nhật Hằng</h3>
+          <div class="wv-stats" id="wvStats"></div>
+          <div class="wv-tools">
+            <label class="wv-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="M20 20l-4-4" /></svg>
+              <input type="search" id="wvQ" placeholder="Tìm theo tên, đơn vị, nội dung..." aria-label="Tìm lời chúc"></label>
+            <div class="wv-chips" role="group" aria-label="Lọc lời chúc">
+              <button type="button" class="on" data-f="all">Tất cả</button><button type="button" data-f="photo">Có ảnh</button>
+            </div>
+            <select id="wvSort" aria-label="Sắp xếp"><option value="new">Mới nhất</option><option value="old">Cũ nhất</option><option value="az">Tên A → Z</option></select>
+          </div>
+        </header>
+        <div class="wv-items" id="wvItems"></div>
+      </div>
+      <div class="wv-lb" id="wvLb" hidden>
+        <img id="wvLbImg" alt="">
+        <p id="wvLbCap"></p>
+        <button type="button" class="wv-nav p" id="wvLbPrev" aria-label="Ảnh trước"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg></button>
+        <button type="button" class="wv-nav n" id="wvLbNext" aria-label="Ảnh sau"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg></button>
+        <button type="button" class="wv-nav c" id="wvLbClose" aria-label="Đóng ảnh"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg></button>
+      </div>
+    </div>
+  </div>
 
   <script>
     /* ==========================================================================
@@ -4708,6 +4962,83 @@
       try { await navigator.clipboard.writeText(location.href); toast("Đã sao chép liên kết"); }
       catch (e) { prompt("Sao chép liên kết:", location.href); }
     });
+
+    /* ---- Xem lời chúc (nút cuối trang): hỏi mật khẩu, máy chủ kiểm tra rồi mới trả nội dung ----
+       Mật khẩu đúng được nhớ trong phiên duyệt (đóng trình duyệt là phải nhập lại). */
+    (function () {
+      const wv = $("#wv"), box = wv.querySelector(".wv-box"), lock = $("#wvLock"), view = $("#wvView"), pw = $("#wvPw"), err = $("#wvErr"), lb = $("#wvLb");
+      const EP = CONFIG.formEndpoint || CONFIG.signEndpoint, SK = "wv_key";
+      let items = [], filt = "all", opener = null, lbList = [], lbI = 0;
+      const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+      const when = t => { const d = new Date(t); return isNaN(d) || !t ? "" : d.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric" }); };
+      const initials = n => { const w = String(n || "").trim().split(/\s+/).filter(Boolean); return (w.length > 1 ? w[w.length - 2][0] + w[w.length - 1][0] : (w[0] || "K")[0]).toUpperCase(); };
+      const fold = s => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D").toLowerCase();
+      const photosOf = w => String(w.photo || "").split(",").map(s => s.trim()).filter(Boolean);
+
+      function render() {
+        const q = fold($("#wvQ").value.trim()), sort = $("#wvSort").value;
+        let list = items.filter(w => (filt !== "photo" || photosOf(w).length) && (!q || fold(w.name + " " + w.org + " " + w.message).includes(q)));
+        list.sort(sort === "old" ? (a, b) => a.t - b.t : sort === "az" ? (a, b) => fold(a.name).localeCompare(fold(b.name)) : (a, b) => b.t - a.t);
+        const num = new Map(items.slice().sort((a, b) => a.t - b.t).map((w, k) => [w, k + 1]));   /* số thứ tự theo thời gian gửi */
+        const nPh = items.reduce((s, w) => s + photosOf(w).length, 0), nOrg = new Set(items.map(w => fold(w.org).trim()).filter(Boolean)).size;
+        $("#wvStats").innerHTML = '<span><b>' + items.length + '</b>lời chúc</span><span><b>' + nPh + '</b>ảnh kỷ niệm</span>' + (nOrg ? '<span><b>' + nOrg + '</b>đơn vị</span>' : "") +
+          (list.length !== items.length ? '<span><b>' + list.length + '</b>đang hiển thị</span>' : "");
+        $("#wvItems").innerHTML = list.length ? list.map((w, i) => {
+          const ph = photosOf(w), shown = ph.slice(0, ph.length > 4 ? 3 : 4), extra = ph.length - shown.length, long = String(w.message).length > 360;
+          return '<article class="wv-card" style="animation-delay:' + Math.min(i, 14) * 35 + 'ms">' +
+            '<header><span class="wv-av" aria-hidden="true">' + esc(initials(w.name)) + '</span><div><p class="who">' + esc(w.name || "Khách mời") + '</p>' +
+            (w.org ? '<p class="org">' + esc(w.org) + '</p>' : "") + '</div><p class="wv-meta"><b>#' + String(num.get(w)).padStart(2, "0") + '</b>' + esc(when(w.t)) + '</p></header>' +
+            (w.message ? '<p class="msg' + (long ? " clamp" : "") + '">' + esc(w.message) + '</p>' + (long ? '<button type="button" class="more">Xem thêm</button>' : "") : "") +
+            (ph.length ? '<div class="pics n' + Math.min(4, shown.length + (extra ? 1 : 0)) + '">' + shown.map((id, k) => '<button type="button" data-w="' + items.indexOf(w) + '" data-k="' + k + '" aria-label="Xem ảnh ' + (k + 1) + '"><img loading="lazy" src="' + esc(driveImg(id, 420)) + '" alt="Ảnh kỷ niệm của ' + esc(w.name) + '"></button>').join("") +
+              (extra ? '<button type="button" data-w="' + items.indexOf(w) + '" data-k="' + shown.length + '" aria-label="Xem thêm ' + extra + ' ảnh"><img loading="lazy" src="' + esc(driveImg(ph[shown.length], 420)) + '" alt=""><span class="plus">+' + extra + '</span></button>' : "") + '</div>' : "") +
+            '</article>';
+        }).join("") : '<div class="wv-empty"><b>' + (items.length ? "Không tìm thấy lời chúc phù hợp" : "Chưa có lời chúc nào") + '</b>' + (items.length ? "Hãy thử từ khóa khác." : "Lời chúc của quý vị sẽ hiện ở đây.") + '</div>';
+      }
+      $("#wvItems").addEventListener("click", e => {
+        const m = e.target.closest(".more"); if (m) { const p = m.previousElementSibling, c = p.classList.toggle("clamp"); m.textContent = c ? "Xem thêm" : "Thu gọn"; return; }
+        const b = e.target.closest(".pics button"); if (b) { const w = items[+b.dataset.w]; lbList = photosOf(w).map(id => ({ id, cap: w.name })); lbI = +b.dataset.k; showLb(); }
+      });
+      function showLb() { const it = lbList[lbI]; if (!it) return; lb.hidden = false; $("#wvLbImg").src = driveImg(it.id, 1600); $("#wvLbCap").textContent = (it.cap || "") + (lbList.length > 1 ? "  ·  " + (lbI + 1) + " / " + lbList.length : ""); ["wvLbPrev", "wvLbNext"].forEach(i => $("#" + i).style.display = lbList.length > 1 ? "" : "none"); }
+      const lbStep = d => { lbI = (lbI + d + lbList.length) % lbList.length; showLb(); };
+      $("#wvLbPrev").onclick = () => lbStep(-1); $("#wvLbNext").onclick = () => lbStep(1); $("#wvLbClose").onclick = () => { lb.hidden = true; $("#wvLbImg").removeAttribute("src"); };
+      lb.addEventListener("click", e => { if (e.target === lb) $("#wvLbClose").click(); });
+
+      async function load(key) {
+        const r = await fetch(EP + (EP.includes("?") ? "&" : "?") + "action=wishes&key=" + encodeURIComponent(key), { cache: "no-store" }).then(x => x.json());
+        if (r && r.service && r.version && !("items" in r)) throw new Error("Máy chủ đang chạy bản cũ (" + r.version + ") nên chưa xem được lời chúc. Vui lòng triển khai Phiên bản mới của mã Apps Script.");
+        if (!r || !r.ok || !Array.isArray(r.items)) throw new Error((r && r.error) || "Không mở được lời chúc");
+        items = r.items;
+        try { sessionStorage.setItem(SK, key); } catch (e) { }
+        box.classList.remove("locked"); lock.hidden = true; view.hidden = false; render();
+      }
+      function open() {
+        if (!EP) return toast("Chưa kết nối máy chủ lời chúc");
+        opener = document.activeElement; wv.hidden = false; document.body.classList.add("wvopen"); lb.hidden = true;
+        let saved = ""; try { saved = sessionStorage.getItem(SK) || ""; } catch (e) { }
+        box.classList.add("locked"); lock.hidden = false; view.hidden = true; err.className = "wv-err"; err.textContent = ""; pw.value = "";
+        if (saved) { err.className = "wv-err info"; err.textContent = "Đang mở lời chúc..."; load(saved).catch(() => { err.textContent = ""; try { sessionStorage.removeItem(SK); } catch (e) { } pw.focus(); }); }
+        else setTimeout(() => pw.focus(), 60);
+      }
+      function close() { wv.hidden = true; lb.hidden = true; document.body.classList.remove("wvopen"); if (opener && opener.focus) opener.focus(); }
+      lock.addEventListener("submit", async e => {
+        e.preventDefault(); const key = pw.value.trim(); if (!key) { err.className = "wv-err"; err.textContent = "Vui lòng nhập mật khẩu."; return pw.focus(); }
+        const b = $("#wvGo"); b.disabled = true; err.className = "wv-err info"; err.textContent = "Đang kiểm tra mật khẩu...";
+        try { await load(key); err.textContent = ""; }
+        catch (x) { err.className = "wv-err"; err.textContent = /fetch|network/i.test(x.message) ? "Không kết nối được máy chủ, vui lòng thử lại." : x.message; pw.select(); }
+        b.disabled = false;
+      });
+      $("#wishBtn").addEventListener("click", open);
+      $("#wvClose").addEventListener("click", close);
+      $("#wvQ").addEventListener("input", render);
+      $("#wvSort").addEventListener("change", render);
+      wv.querySelectorAll(".wv-chips button").forEach(b => b.addEventListener("click", () => { filt = b.dataset.f; wv.querySelectorAll(".wv-chips button").forEach(x => x.classList.toggle("on", x === b)); render(); }));
+      wv.addEventListener("click", e => { if (e.target === wv) close(); });
+      document.addEventListener("keydown", e => {
+        if (wv.hidden) return;
+        if (!lb.hidden) { if (e.key === "Escape") $("#wvLbClose").click(); else if (e.key === "ArrowLeft") lbStep(-1); else if (e.key === "ArrowRight") lbStep(1); return; }
+        if (e.key === "Escape") close();
+      });
+    })();
 
     /* ---- Nhạc nền: tự phát khi bấm "Mở thiệp"; nút góc dưới để bật/tắt ---- */
     const setMusicBtn = on => { const b = $("#music"); b.setAttribute("aria-pressed", String(on)); b.setAttribute("aria-label", on ? "Tắt nhạc nền" : "Bật nhạc nền"); };
