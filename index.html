@@ -4011,9 +4011,9 @@
           </div>
           <div class="field">
             <label for="f-msg">Lời nhắn gửi tới Cô Nguyễn Thị Nhật Hằng *</label>
-            <textarea id="f-msg" name="message" maxlength="1000" style="min-height:140px"
+            <textarea id="f-msg" name="message" maxlength="12000" style="min-height:140px"
               placeholder="Quý vị hãy gửi đôi dòng yêu thương, kỷ niệm hoặc lời chúc..."></textarea>
-            <p class="dev-note" style="text-align:right;margin-top:4px"><span id="f-count">0</span>/1000</p>
+            <p class="dev-note" style="text-align:right;margin-top:4px"><span id="f-count">0</span>/1200 từ</p>
             <p class="err" id="e-msg">Vui lòng nhập lời nhắn gửi (tối thiểu 5 ký tự).</p>
           </div>
           <div class="field">
@@ -4555,7 +4555,17 @@
 
     /* ---- Form gửi lời tri ân ---- */
     const form = $("#rsvpForm");
-    form.message.addEventListener("input", () => { $("#f-count").textContent = form.message.value.length; });
+    /* giới hạn lời tri ân: tối đa MAX_WORDS từ (đếm theo khoảng trắng) */
+    const MAX_WORDS = 1200;
+    const countWords = t => (t.trim().match(/S+/g) || []).length;
+    form.message.addEventListener("input", () => {
+      let n = countWords(form.message.value);
+      if (n > MAX_WORDS) {   /* quá giới hạn: cắt bớt phần thừa */
+        form.message.value = form.message.value.match(new RegExp("^\\s*(?:\\S+\\s+){" + (MAX_WORDS - 1) + "}\\S+"))[0];
+        n = MAX_WORDS; toast("Lời tri ân tối đa " + MAX_WORDS + " từ");
+      }
+      $("#f-count").textContent = n;
+    });
     /* ảnh chụp chung (tối đa 15): thu nhỏ trong trình duyệt (cạnh dài 1200 px, JPEG) trước khi gửi */
     const MAXP = 15, photos = []; let photoBusy = 0, lastYear = "";
     /* năm cho từng ảnh (khớp các chương kỷ yếu); ảnh mới tải lên lấy sẵn năm vừa chọn gần nhất */
